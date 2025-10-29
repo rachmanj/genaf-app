@@ -14,7 +14,9 @@ class SupplyRequestItem extends Model
         'request_id',
         'supply_id',
         'quantity',
+        'approved_quantity',
         'fulfilled_quantity',
+        'fulfillment_status',
         'notes',
     ];
 
@@ -22,6 +24,7 @@ class SupplyRequestItem extends Model
     {
         return [
             'quantity' => 'integer',
+            'approved_quantity' => 'integer',
             'fulfilled_quantity' => 'integer',
         ];
     }
@@ -43,18 +46,33 @@ class SupplyRequestItem extends Model
     }
 
     /**
-     * Check if item is fully fulfilled
+     * Get remaining quantity to fulfill (based on approved quantity)
      */
-    public function isFullyFulfilled(): bool
+    public function getRemainingQuantity(): int
     {
-        return $this->fulfilled_quantity >= $this->quantity;
+        return $this->approved_quantity - $this->fulfilled_quantity;
     }
 
     /**
-     * Get remaining quantity to fulfill
+     * Check if item can be fulfilled
      */
-    public function getRemainingQuantityAttribute(): int
+    public function canBeFulfilled(): bool
     {
-        return $this->quantity - $this->fulfilled_quantity;
+        return $this->getRemainingQuantity() > 0;
+    }
+
+    /**
+     * Update fulfillment status based on quantities
+     */
+    public function updateFulfillmentStatus(): void
+    {
+        if ($this->fulfilled_quantity == 0) {
+            $this->fulfillment_status = 'pending';
+        } elseif ($this->fulfilled_quantity >= $this->approved_quantity) {
+            $this->fulfillment_status = 'completed';
+        } else {
+            $this->fulfillment_status = 'partial';
+        }
+        $this->save();
     }
 }

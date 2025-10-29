@@ -13,10 +13,13 @@ class SupplyRequest extends Model
 
     protected $fillable = [
         'employee_id',
+        'department_id',
         'request_date',
         'status',
-        'approved_by',
-        'approved_at',
+        'department_head_approved_by',
+        'department_head_approved_at',
+        'ga_admin_approved_by',
+        'ga_admin_approved_at',
         'notes',
         'rejection_reason',
     ];
@@ -25,7 +28,8 @@ class SupplyRequest extends Model
     {
         return [
             'request_date' => 'date',
-            'approved_at' => 'datetime',
+            'department_head_approved_at' => 'datetime',
+            'ga_admin_approved_at' => 'datetime',
         ];
     }
 
@@ -38,11 +42,27 @@ class SupplyRequest extends Model
     }
 
     /**
-     * Get the user that approved the request
+     * Get the department that made the request
      */
-    public function approver(): BelongsTo
+    public function department(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'approved_by');
+        return $this->belongsTo(Department::class);
+    }
+
+    /**
+     * Get the department head that approved the request
+     */
+    public function departmentHeadApprover(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'department_head_approved_by');
+    }
+
+    /**
+     * Get the GA admin that approved the request
+     */
+    public function gaAdminApprover(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'ga_admin_approved_by');
     }
 
     /**
@@ -54,18 +74,58 @@ class SupplyRequest extends Model
     }
 
     /**
-     * Check if request can be approved
+     * Check if request can be approved by department head
      */
-    public function canBeApproved(): bool
+    public function canBeDeptHeadApproved(): bool
     {
-        return $this->status === 'pending';
+        return $this->status === 'pending_dept_head';
     }
 
     /**
-     * Check if request can be rejected
+     * Check if request can be approved by GA admin
      */
-    public function canBeRejected(): bool
+    public function canBeGAAdminApproved(): bool
     {
-        return $this->status === 'pending';
+        return $this->status === 'pending_ga_admin';
+    }
+
+    /**
+     * Check if request can be fulfilled
+     */
+    public function canBeFulfilled(): bool
+    {
+        return $this->status === 'approved';
+    }
+
+    /**
+     * Check if request is partially fulfilled
+     */
+    public function isPartiallyFulfilled(): bool
+    {
+        return $this->status === 'partially_fulfilled';
+    }
+
+    /**
+     * Check if request is fully fulfilled
+     */
+    public function isFullyFulfilled(): bool
+    {
+        return $this->status === 'fulfilled';
+    }
+
+    /**
+     * Check if request can be rejected by department head
+     */
+    public function canBeDeptHeadRejected(): bool
+    {
+        return $this->status === 'pending_dept_head';
+    }
+
+    /**
+     * Check if request can be rejected by GA admin
+     */
+    public function canBeGAAdminRejected(): bool
+    {
+        return $this->status === 'pending_ga_admin';
     }
 }

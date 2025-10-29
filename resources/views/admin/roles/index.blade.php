@@ -16,19 +16,6 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible">
-                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                            {{ session('success') }}
-                        </div>
-                    @endif
-
-                    @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible">
-                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                            {{ session('error') }}
-                        </div>
-                    @endif
 
                     <div class="card card-primary card-outline">
                         <div class="card-header">
@@ -71,6 +58,14 @@
 @push('js')
     <script>
         $(function() {
+            // Handle session notifications with Toastr
+            @if (session('success'))
+                toastr.success('{{ session('success') }}');
+            @endif
+
+            @if (session('error'))
+                toastr.error('{{ session('error') }}');
+            @endif
             $('#tbl-roles').DataTable({
                 processing: true,
                 serverSide: true,

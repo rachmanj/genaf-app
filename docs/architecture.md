@@ -98,7 +98,17 @@ A comprehensive enterprise management system for GENAF company covering office s
 -   **Responsive Design**: Mobile-friendly interface
 -   **Theme System**: Professional AdminLTE styling
 
-### 4. Data Management
+### 4. Office Supplies Management
+
+-   **Supply Master Data**: Supply items with stock tracking
+-   **Supply Requests**: Two-level approval workflow (Dept Head → GA Admin)
+-   **Stock Transactions**: Incoming/outgoing tracking with source tracking
+-   **Supply Fulfillment**: Partial fulfillment with distribution tracking
+-   **Department Stock**: Department-based stock allocation and reporting
+-   **Departments**: Department management with API sync preparation
+-   **Stock Opname**: Physical inventory count with gradual counting support
+
+### 5. Data Management
 
 -   **DataTables Integration**: Server-side processing for large datasets
 -   **Search & Filtering**: Advanced search capabilities
@@ -151,6 +161,142 @@ model_has_permissions (Spatie package)
 role_has_permissions (Spatie package)
 ├── permission_id
 └── role_id
+```
+
+#### Office Supplies
+
+```sql
+supplies
+├── id (primary key)
+├── code (unique)
+├── name
+├── category
+├── unit
+├── current_stock
+├── min_stock
+├── price (nullable)
+├── description
+├── is_active (boolean)
+├── created_at
+└── updated_at
+
+departments
+├── id (primary key)
+├── department_name (unique)
+├── slug (unique)
+├── status (boolean)
+├── created_at
+└── updated_at
+
+supply_requests
+├── id (primary key)
+├── employee_id (foreign key)
+├── department_id (foreign key)
+├── request_date
+├── status (pending_dept_head, pending_ga_admin, approved, rejected, partially_fulfilled, fulfilled)
+├── department_head_approved_by
+├── department_head_approved_at
+├── ga_admin_approved_by
+├── ga_admin_approved_at
+├── notes
+├── created_at
+└── updated_at
+
+supply_request_items
+├── id (primary key)
+├── request_id (foreign key)
+├── supply_id (foreign key)
+├── quantity
+├── approved_quantity
+├── fulfilled_quantity
+├── fulfillment_status (pending, partially_fulfilled, completed)
+├── created_at
+└── updated_at
+
+supply_transactions
+├── id (primary key)
+├── supply_id (foreign key)
+├── type (in, out)
+├── source (sap, manual)
+├── supplier_name (nullable)
+├── purchase_order_no (nullable)
+├── department_id (nullable, foreign key)
+├── quantity
+├── reference_no
+├── transaction_date
+├── notes
+├── user_id (foreign key)
+├── created_at
+└── updated_at
+
+supply_distributions
+├── id (primary key)
+├── supply_id (foreign key)
+├── department_id (foreign key)
+├── request_item_id (foreign key)
+├── quantity
+├── distribution_date
+├── distributed_by (foreign key)
+├── notes
+├── created_at
+└── updated_at
+
+stock_opname_sessions
+├── id (primary key)
+├── session_code (unique)
+├── title
+├── description
+├── type (manual, scheduled)
+├── schedule_type (monthly, quarterly, yearly, nullable)
+├── status (draft, in_progress, completed, approved, cancelled)
+├── started_at
+├── completed_at
+├── approved_at
+├── created_by (foreign key)
+├── approved_by (foreign key)
+├── total_items
+├── counted_items
+├── items_with_variance
+├── total_variance_value
+├── notes
+├── created_at
+└── updated_at
+
+stock_opname_items
+├── id (primary key)
+├── session_id (foreign key)
+├── supply_id (foreign key)
+├── system_stock
+├── actual_count (nullable)
+├── variance (calculated)
+├── variance_value (calculated)
+├── status (pending, counting, counted, verified)
+├── reason_code (damaged, expired, lost, found, miscount, other)
+├── reason_notes
+├── photo_path
+├── location_verified (boolean)
+├── counted_by (foreign key)
+├── counted_at
+├── verified_by (foreign key)
+├── verified_at
+├── created_at
+└── updated_at
+
+stock_adjustments
+├── id (primary key)
+├── session_id (foreign key)
+├── supply_id (foreign key)
+├── adjustment_type (increase, decrease)
+├── quantity
+├── old_stock
+├── new_stock
+├── reason_code
+├── reason_notes
+├── transaction_id (foreign key)
+├── adjusted_by (foreign key)
+├── adjusted_at
+├── created_at
+└── updated_at
 ```
 
 ### Permission System
@@ -292,15 +438,24 @@ resources/views/layouts/
 ### ✅ Completed Modules
 
 -   **Module 1**: Users, Roles & Permissions Management (100% complete)
+
     -   User CRUD with DataTables
     -   Role Management (CRUD)
     -   Permission Management (CRUD)
     -   AdminLTE professional UI
     -   Comprehensive testing
 
+-   **Module 2**: Office Supplies Management (95% complete)
+    -   Supply Master Data (CRUD operations)
+    -   Supply Requests with Two-Level Approval (Department Head → GA Admin)
+    -   Stock Transactions (incoming/outgoing tracking)
+    -   Supply Fulfillment System with partial fulfillment
+    -   Department Stock Allocation and Reporting
+    -   Departments Management with API sync preparation
+    -   Stock Opname Module (Physical Inventory Count) - 95% complete
+
 ### 🚧 Next Modules
 
--   **Module 2**: Office Supplies Management
 -   **Module 3**: Ticket Reservation Management
 -   **Module 4**: Property Management System
 -   **Module 5**: Vehicle Administration

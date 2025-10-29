@@ -68,3 +68,27 @@
 **Challenge**: Maintain comprehensive documentation following .cursorrules guidelines
 **Solution**: Created structured documentation system: plan.md (implementation status), architecture.md (technical reference), decisions.md (ADR), todo.md (task tracking)
 **Key Learning**: Structured documentation enables better AI assistance and team collaboration, follows enterprise development standards
+
+### [MEM-008] Notification System Consistency Fix (2025-01-24) ✅ COMPLETE
+
+**Challenge**: Inconsistent notification system - some views used Bootstrap alerts instead of Toastr
+**Solution**: Updated all views (supplies, roles, users) to use Toastr for notifications and SweetAlert2 for confirmations, removed Bootstrap alert blocks
+**Key Learning**: Consistency in notification system is crucial for professional UX, Toastr provides better user experience than static Bootstrap alerts
+
+### [MEM-011] Route Hierarchy Restructuring (2025-01-24) ✅ COMPLETE
+
+**Challenge**: User requested proper route hierarchy - stock transactions and supply requests should be nested under supplies
+**Solution**: Restructured routes to `/supplies/requests` and `/supplies/transactions`, updated all controllers, views, and sidebar links, reordered routes to prevent conflicts
+**Key Learning**: Route ordering is critical in Laravel - more specific routes must come before generic parameterized routes to prevent conflicts
+
+### [MEM-012] Office Supplies Module Complete Implementation (2025-01-25) ✅ COMPLETE
+
+**Challenge**: Implement comprehensive Office Supplies Management with two-level approval, fulfillment, and inventory tracking
+**Solution**: Created SupplyRequests with department-based workflow, SupplyFulfillment with partial fulfillment support, SupplyTransactions with source tracking, DepartmentStock allocation, Departments CRUD with API sync preparation, comprehensive permissions and routes
+**Key Learning**: Two-level approval workflows (Dept Head → GA Admin) with partial fulfillment enable realistic enterprise supply management, department-based allocation provides accountability
+
+### [MEM-013] Stock Opname Module with Gradual Counting (2025-01-25) ⚠️ PARTIAL
+
+**Challenge**: Implement physical inventory count system with gradual counting, save progress, and complete later functionality
+**Solution**: Created StockOpnameSession/Items models with status workflow (pending → counting → counted → verified), implemented saveDraft and finalizeCount methods, added photo evidence upload, variance calculation with reason codes, automatic stock adjustment after approval
+**Key Learning**: Gradual counting with draft save enables realistic stock opname workflows - items can be in 'counting' status (work-in-progress) before finalization, concurrent counting supported, status-based workflow provides clear progress tracking

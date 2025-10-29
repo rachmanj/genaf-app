@@ -378,6 +378,145 @@ Each decision follows this structure:
 
 ---
 
+## ADR-011: Office Supplies Route Hierarchy
+
+**Date**: January 2025  
+**Status**: Accepted  
+**Context**: Need to determine proper route hierarchy for supplies-related functionality.
+
+**Decision**: Use `/supplies` as base route with nested routes for related functionality (`/supplies/requests`, `/supplies/transactions`, etc.).
+
+**Alternatives Considered**:
+
+1. **Separate top-level routes**: `/supplies`, `/requests`, `/transactions` as separate routes
+2. **Admin-prefixed routes**: `/admin/supplies/requests` under admin prefix
+3. **Nested under supplies**: `/supplies/requests` with logical hierarchy
+
+**Rationale**:
+
+-   Supplies management is not exclusively admin functionality - managers and employees also access it
+-   Nested routes create logical hierarchy and organization
+-   Clear separation of concerns (requests, transactions, fulfillment)
+-   Easy to extend with additional nested functionality
+-   Better URL structure for user understanding
+
+**Consequences**:
+
+-   ✅ **Positive**: Logical route hierarchy
+-   ✅ **Positive**: Clear organization of functionality
+-   ✅ **Positive**: Better URL structure
+-   ✅ **Positive**: Scalable for future additions
+-   ⚠️ **Negative**: Must manage route ordering carefully to prevent conflicts
+
+**Review Date**: March 2025
+
+---
+
+## ADR-012: Two-Level Approval Workflow for Supply Requests
+
+**Date**: January 2025  
+**Status**: Accepted  
+**Context**: Need realistic approval workflow for supply requests that reflects enterprise organizational structure.
+
+**Decision**: Implement two-level approval workflow: Department Head → GA Admin.
+
+**Alternatives Considered**:
+
+1. **Single approval**: GA Admin only
+2. **Three-level approval**: Employee → Dept Head → Manager → GA Admin
+3. **Two-level approval**: Dept Head → GA Admin
+
+**Rationale**:
+
+-   Reflects realistic organizational structure
+-   Department Head approves requests from their department
+-   GA Admin has final approval and fulfillment authority
+-   Balanced between approval rigor and process efficiency
+-   Supports department-based accountability
+
+**Consequences**:
+
+-   ✅ **Positive**: Realistic workflow matching organizational structure
+-   ✅ **Positive**: Department-based accountability
+-   ✅ **Positive**: Clear approval chain
+-   ✅ **Positive**: Flexible status tracking (pending_dept_head, pending_ga_admin)
+-   ⚠️ **Negative**: More complex status management
+
+**Review Date**: March 2025
+
+---
+
+## ADR-013: Partial Fulfillment Support
+
+**Date**: January 2025  
+**Status**: Accepted  
+**Context**: Need to support realistic scenarios where stock may be insufficient for full request fulfillment.
+
+**Decision**: Implement partial fulfillment with tracking of approved_quantity, fulfilled_quantity, and fulfillment_status per item.
+
+**Alternatives Considered**:
+
+1. **All-or-nothing**: Either fulfill complete request or reject
+2. **Automatic partial**: Automatically fulfill available quantity
+3. **Manual partial**: GA Admin manually decides fulfillment quantities
+
+**Rationale**:
+
+-   Realistic inventory scenarios (stock shortages, partial shipments)
+-   Better customer service (fulfill available items instead of rejecting entire request)
+-   Flexible request management
+-   Clear tracking of fulfillment status per item
+-   Supports department needs even with stock constraints
+
+**Consequences**:
+
+-   ✅ **Positive**: Realistic inventory management
+-   ✅ **Positive**: Better customer service
+-   ✅ **Positive**: Flexible fulfillment options
+-   ✅ **Positive**: Clear item-level tracking
+-   ⚠️ **Negative**: More complex fulfillment logic
+-   ⚠️ **Negative**: Status management complexity (partially_fulfilled status)
+
+**Review Date**: March 2025
+
+---
+
+## ADR-014: Stock Opname Gradual Counting Support
+
+**Date**: January 2025  
+**Status**: Accepted  
+**Context**: Need to support realistic stock opname workflow where users count items gradually and save progress.
+
+**Decision**: Implement gradual counting with status workflow: pending → counting → counted → verified.
+
+**Alternatives Considered**:
+
+1. **All-at-once**: Must count all items in single session
+2. **Batch counting**: Count in fixed batches
+3. **Gradual counting**: Count items individually, save progress, complete later
+
+**Rationale**:
+
+-   Realistic warehouse/inventory workflows
+-   Supports large-scale stock opname sessions
+-   Allows concurrent counting by multiple users
+-   'Counting' status represents work-in-progress state
+-   Draft save functionality enables progress preservation
+-   Clear workflow progression
+
+**Consequences**:
+
+-   ✅ **Positive**: Realistic counting workflow
+-   ✅ **Positive**: Supports large-scale inventory counts
+-   ✅ **Positive**: Concurrent counting support
+-   ✅ **Positive**: Progress preservation with draft save
+-   ⚠️ **Negative**: More complex status management
+-   ⚠️ **Negative**: Additional data persistence requirements
+
+**Review Date**: March 2025
+
+---
+
 ## Summary
 
 These architectural decisions form the foundation of the GENAF Enterprise Management System. They prioritize:

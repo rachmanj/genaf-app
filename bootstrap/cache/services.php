@@ -24,17 +24,16 @@
     20 => 'Illuminate\\Translation\\TranslationServiceProvider',
     21 => 'Illuminate\\Validation\\ValidationServiceProvider',
     22 => 'Illuminate\\View\\ViewServiceProvider',
-    23 => 'Laravel\\Breeze\\BreezeServiceProvider',
-    24 => 'Laravel\\Sail\\SailServiceProvider',
-    25 => 'Laravel\\Tinker\\TinkerServiceProvider',
-    26 => 'Livewire\\LivewireServiceProvider',
-    27 => 'Carbon\\Laravel\\ServiceProvider',
-    28 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
-    29 => 'Termwind\\Laravel\\TermwindServiceProvider',
-    30 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
-    31 => 'Spatie\\Permission\\PermissionServiceProvider',
-    32 => 'Yajra\\DataTables\\DataTablesServiceProvider',
-    33 => 'App\\Providers\\AppServiceProvider',
+    23 => 'Laravel\\Sail\\SailServiceProvider',
+    24 => 'Laravel\\Tinker\\TinkerServiceProvider',
+    25 => 'Livewire\\LivewireServiceProvider',
+    26 => 'Carbon\\Laravel\\ServiceProvider',
+    27 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
+    28 => 'Termwind\\Laravel\\TermwindServiceProvider',
+    29 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
+    30 => 'Spatie\\Permission\\PermissionServiceProvider',
+    31 => 'Yajra\\DataTables\\DataTablesServiceProvider',
+    32 => 'App\\Providers\\AppServiceProvider',
   ),
   'eager' => 
   array (
@@ -210,7 +209,6 @@
     'validator' => 'Illuminate\\Validation\\ValidationServiceProvider',
     'validation.presence' => 'Illuminate\\Validation\\ValidationServiceProvider',
     'Illuminate\\Contracts\\Validation\\UncompromisedVerifier' => 'Illuminate\\Validation\\ValidationServiceProvider',
-    'Laravel\\Breeze\\Console\\InstallCommand' => 'Laravel\\Breeze\\BreezeServiceProvider',
     'Laravel\\Sail\\Console\\InstallCommand' => 'Laravel\\Sail\\SailServiceProvider',
     'Laravel\\Sail\\Console\\PublishCommand' => 'Laravel\\Sail\\SailServiceProvider',
     'command.tinker' => 'Laravel\\Tinker\\TinkerServiceProvider',
@@ -254,9 +252,6 @@
     array (
     ),
     'Illuminate\\Validation\\ValidationServiceProvider' => 
-    array (
-    ),
-    'Laravel\\Breeze\\BreezeServiceProvider' => 
     array (
     ),
     'Laravel\\Sail\\SailServiceProvider' => 

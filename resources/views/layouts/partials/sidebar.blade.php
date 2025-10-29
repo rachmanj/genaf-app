@@ -26,54 +26,12 @@
                 <!-- Divider -->
                 <li class="nav-header">MAIN</li>
 
-                <!-- User Management -->
-                @can('view users')
-                    <li class="nav-item">
-                        <a href="{{ route('users.index') }}"
-                            class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>User Management</p>
-                        </a>
-                    </li>
-                @endcan
-
-                <!-- Admin Section -->
-                @canany(['view roles', 'view permissions'])
-                    <li class="nav-item {{ request()->routeIs('admin.*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-user-shield"></i>
-                            <p>
-                                Admin
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            @can('view roles')
-                                <li class="nav-item">
-                                    <a href="{{ route('admin.roles.index') }}"
-                                        class="nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Roles</p>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('view permissions')
-                                <li class="nav-item">
-                                    <a href="{{ route('admin.permissions.index') }}"
-                                        class="nav-link {{ request()->routeIs('admin.permissions.*') ? 'active' : '' }}">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Permissions</p>
-                                    </a>
-                                </li>
-                            @endcan
-                        </ul>
-                    </li>
-                @endcanany
-
                 <!-- Office Supplies -->
                 @can('view supplies')
-                    <li class="nav-item {{ request()->routeIs('supplies.*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs('supplies.*') ? 'active' : '' }}">
+                    <li
+                        class="nav-item {{ request()->routeIs('supplies.*') || request()->routeIs('stock-opname.*') ? 'menu-open' : '' }}">
+                        <a href="#"
+                            class="nav-link {{ request()->routeIs('supplies.*') || request()->routeIs('stock-opname.*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-box"></i>
                             <p>
                                 Office Supplies
@@ -82,17 +40,53 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="{{ route('supplies.index') }}"
+                                    class="nav-link {{ request()->routeIs('supplies.index') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Stock Management</p>
+                                    <p>Supplies Management</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="{{ route('supplies.requests.index') }}"
+                                    class="nav-link {{ request()->routeIs('supplies.requests.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Supply Requests</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{ route('supplies.transactions.index') }}"
+                                    class="nav-link {{ request()->routeIs('supplies.transactions.*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Stock Transactions</p>
+                                </a>
+                            </li>
+                            @can('view supply fulfillment')
+                                <li class="nav-item">
+                                    <a href="{{ route('supplies.fulfillment.index') }}"
+                                        class="nav-link {{ request()->routeIs('supplies.fulfillment.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Fulfillment</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('view department stock')
+                                <li class="nav-item">
+                                    <a href="{{ route('supplies.department-stock.index') }}"
+                                        class="nav-link {{ request()->routeIs('supplies.department-stock.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Department Stock</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('view stock opname')
+                                <li class="nav-item">
+                                    <a href="{{ route('stock-opname.index') }}"
+                                        class="nav-link {{ request()->routeIs('stock-opname.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Stock Opname</p>
+                                    </a>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
                 @endcan
@@ -118,33 +112,6 @@
                                 <a href="#" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Hotel Reservations</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                @endcan
-
-                <!-- Property Management -->
-                @can('view rooms')
-                    <li class="nav-item {{ request()->routeIs('rooms.*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs('rooms.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-bed"></i>
-                            <p>
-                                Property Management
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Room Management</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Reservations</p>
                                 </a>
                             </li>
                         </ul>
@@ -184,6 +151,33 @@
                     </li>
                 @endcan
 
+                <!-- Property Management -->
+                @can('view rooms')
+                    <li class="nav-item {{ request()->routeIs('rooms.*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('rooms.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-bed"></i>
+                            <p>
+                                Property Management
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Room Management</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Reservations</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endcan
+
                 <!-- Asset Inventory -->
                 @can('view assets')
                     <li class="nav-item {{ request()->routeIs('assets.*') ? 'menu-open' : '' }}">
@@ -211,7 +205,7 @@
                     </li>
                 @endcan
 
-                <!-- Reports -->
+                <!-- Reports & Analytics -->
                 @can('view reports')
                     <li class="nav-item {{ request()->routeIs('reports.*') ? 'menu-open' : '' }}">
                         <a href="#" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
@@ -244,6 +238,58 @@
                     </li>
                 @endcan
 
+                <!-- Admin Section -->
+                @canany(['view users', 'view roles', 'view permissions', 'view departments'])
+                    <li
+                        class="nav-item {{ request()->routeIs('users.*') || request()->routeIs('admin.*') || request()->routeIs('departments.*') ? 'menu-open' : '' }}">
+                        <a href="#"
+                            class="nav-link {{ request()->routeIs('users.*') || request()->routeIs('admin.*') || request()->routeIs('departments.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-user-shield"></i>
+                            <p>
+                                Admin
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @can('view users')
+                                <li class="nav-item">
+                                    <a href="{{ route('users.index') }}"
+                                        class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>User Management</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('view departments')
+                                <li class="nav-item">
+                                    <a href="{{ route('departments.index') }}"
+                                        class="nav-link {{ request()->routeIs('departments.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Departments</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('view roles')
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.roles.index') }}"
+                                        class="nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Roles</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('view permissions')
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.permissions.index') }}"
+                                        class="nav-link {{ request()->routeIs('admin.permissions.*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Permissions</p>
+                                    </a>
+                                </li>
+                            @endcan
+                        </ul>
+                    </li>
+                @endcanany
 
             </ul>
         </nav>

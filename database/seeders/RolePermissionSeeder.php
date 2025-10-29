@@ -47,6 +47,44 @@ class RolePermissionSeeder extends Seeder
             'create supply requests',
             'edit supply requests',
             'approve supply requests',
+            'reject supply requests',
+            'delete supply requests',
+            'view supply transactions',
+            'create supply transactions',
+            'delete supply transactions',
+
+            // Department Management
+            'view departments',
+            'create departments',
+            'edit departments',
+
+            // Department Head Approvals
+            'approve dept head supply requests',
+            'reject dept head supply requests',
+
+            // GA Admin Approvals
+            'approve ga admin supply requests',
+            'reject ga admin supply requests',
+
+            // Supply Fulfillment
+            'view supply fulfillment',
+            'fulfill supply requests',
+
+            // Department Stock Management
+            'view department stock',
+            'view department stock reports',
+
+            // Stock Opname
+            'view stock opname',
+            'create stock opname',
+            'start stock opname',
+            'count stock opname',
+            'verify stock opname',
+            'complete stock opname',
+            'approve stock opname',
+            'cancel stock opname',
+            'export stock opname',
+            'view stock opname reports',
 
             // Ticket Reservations
             'view ticket reservations',
@@ -124,15 +162,82 @@ class RolePermissionSeeder extends Seeder
         ])->get();
         $managerRole->syncPermissions($managerPermissions);
 
+        // GA Admin role - General Affairs Admin with supply management permissions
+        $gaAdminRole = Role::firstOrCreate(['name' => 'ga admin']);
+        $gaAdminPermissions = [
+            'view supplies',
+            'create supplies',
+            'edit supplies',
+            'view supply requests',
+            'approve ga admin supply requests',
+            'reject ga admin supply requests',
+            'view supply transactions',
+            'create supply transactions',
+            'delete supply transactions',
+            'view supply fulfillment',
+            'fulfill supply requests',
+            'view department stock',
+            'view department stock reports',
+            'view departments',
+            'view stock opname',
+            'create stock opname',
+            'start stock opname',
+            'count stock opname',
+            'verify stock opname',
+            'complete stock opname',
+            'approve stock opname',
+            'cancel stock opname',
+            'export stock opname',
+            'view stock opname reports',
+            'view ticket reservations',
+            'view rooms',
+            'view room reservations',
+            'view vehicles',
+            'view fuel records',
+            'view vehicle maintenance',
+            'view assets',
+            'view asset maintenance',
+            'view asset transfers',
+            'view reports',
+        ];
+        $gaAdminRole->syncPermissions($gaAdminPermissions);
+
+        // Department Head role - can approve department requests
+        $deptHeadRole = Role::firstOrCreate(['name' => 'department head']);
+        $deptHeadPermissions = [
+            'view supplies',
+            'view supply requests',
+            'create supply requests',
+            'approve dept head supply requests',
+            'reject dept head supply requests',
+            'view department stock',
+            'view stock opname',
+            'count stock opname',
+            'view ticket reservations',
+            'create ticket reservations',
+            'view rooms',
+            'view room reservations',
+            'create room reservations',
+            'view vehicles',
+            'view fuel records',
+            'create fuel records',
+            'view vehicle maintenance',
+            'view assets',
+            'view asset maintenance',
+            'view asset transfers',
+        ];
+        $deptHeadRole->syncPermissions($deptHeadPermissions);
+
         // Employee role - basic permissions
         $employeeRole = Role::firstOrCreate(['name' => 'employee']);
         $employeePermissions = [
             'view supplies',
             'create supply requests',
             'view supply requests',
+            'view stock opname',
+            'count stock opname',
             'view ticket reservations',
             'create ticket reservations',
-            'view ticket reservations',
             'view rooms',
             'view room reservations',
             'create room reservations',

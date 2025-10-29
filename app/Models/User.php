@@ -21,7 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'nik',
         'department',
+        'department_id',
         'phone',
         'is_active',
     ];
@@ -69,5 +71,37 @@ class User extends Authenticatable
     public function canApprove(): bool
     {
         return $this->hasAnyRole(['admin', 'manager']);
+    }
+
+    /**
+     * Get the department that the user belongs to.
+     */
+    public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    /**
+     * Get the supply requests made by this user.
+     */
+    public function supplyRequests(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SupplyRequest::class, 'employee_id');
+    }
+
+    /**
+     * Get the supply distributions made by this user.
+     */
+    public function supplyDistributions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SupplyDistribution::class, 'distributed_by');
+    }
+
+    /**
+     * Get the supply transactions recorded by this user.
+     */
+    public function supplyTransactions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SupplyTransaction::class, 'user_id');
     }
 }
