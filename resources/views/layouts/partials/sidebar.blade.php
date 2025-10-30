@@ -104,8 +104,8 @@
 
                 <!-- Vehicle Administration -->
                 @can('view vehicles')
-                    <li class="nav-item {{ request()->routeIs('vehicles.*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs('vehicles.*') ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->routeIs('vehicles.*') || request()->routeIs('fuel-records.*') || request()->routeIs('vehicle-maintenance.*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('vehicles.*') || request()->routeIs('fuel-records.*') || request()->routeIs('vehicle-maintenance.*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-car"></i>
                             <p>
                                 Vehicle Administration
@@ -114,19 +114,19 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="{{ route('vehicles.index') }}" class="nav-link {{ request()->routeIs('vehicles.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Vehicle Management</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="{{ route('fuel-records.index') }}" class="nav-link {{ request()->routeIs('fuel-records.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Fuel Records</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="{{ route('vehicle-maintenance.index') }}" class="nav-link {{ request()->routeIs('vehicle-maintenance.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Maintenance</p>
                                 </a>

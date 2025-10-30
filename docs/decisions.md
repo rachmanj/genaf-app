@@ -562,3 +562,55 @@ These architectural decisions form the foundation of the GENAF Enterprise Manage
 6. **Quality**: Comprehensive testing with browser automation
 
 All decisions are scheduled for review in March 2025 to ensure they continue to meet the project's needs as it evolves.
+
+---
+
+## ADR-017: Vehicle Administration Architecture
+
+**Date**: 2025-10-30  
+**Status**: Accepted  
+**Context**: Introduce Vehicle Administration to manage vehicles, fuel, documents, and maintenance with alerts.  
+**Decision**: Implement resource controllers (`Vehicle`, `FuelRecord`, `VehicleDocument`, `VehicleMaintenance`), global list routes for fuel and maintenance, secure document storage under `public` disk, and dashboard widgets for expiring documents (90 days) and upcoming services (30 days).  
+**Alternatives Considered**:
+1. Fully nested routes only under `/vehicles/{vehicle}`  
+2. Single monolithic VehicleController handling all sub-resources  
+3. Split controllers per sub-resource with global list routes (chosen)
+
+**Rationale**:
+- Clear separation of concerns and simpler list pages with global filters  
+- Easier navigation via sidebar to fuel/maintenance without selecting a vehicle  
+- Secure download via storage disk and permission `download vehicle documents`
+
+**Consequences**:
+- ✅ Simpler UX with direct access lists  
+- ✅ Maintainable structure aligning with other modules  
+- ⚠️ Additional route surface area  
+- ⚠️ Requires consistent permission seeding and checks
+
+**Review Date**: 2025-12-15
+
+---
+
+## ADR-018: Align Vehicle Pages with Supplies Layout and Client-side DataTables (Interim)
+
+**Date**: 2025-10-30  
+**Status**: Accepted  
+**Context**: Vehicle pages initially had minimal markup and inconsistent stacks. Needed to match established AdminLTE pattern used by Supplies and provide filterable lists.  
+**Decision**: Align Vehicles, Fuel Records, and Maintenance index views to supplies layout (breadcrumbs, card outline, icons, @push('js')). Implement client-side DataTables with an index column and responsive settings. Vehicles index includes Type/Status filters.  
+**Alternatives Considered**:
+1. Full server-side DataTables immediately  
+2. Keep minimal tables without filters  
+3. Client-side DataTables now, server-side later (chosen)
+
+**Rationale**:
+- Fast alignment with consistent UX across modules  
+- Lower controller complexity while endpoints stabilize  
+- Filters deliver immediate value for Vehicles index
+
+**Consequences**:
+- ✅ Consistent UI and script stacks  
+- ✅ Usable filterable lists today  
+- ⚠️ Client-side DataTables may not scale for very large datasets  
+- ⚠️ Will require server-side endpoint changes when scaling
+
+**Review Date**: 2025-12-15

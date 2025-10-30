@@ -104,3 +104,15 @@
 **Challenge**: Build ticket reservation system with approval workflow, document management, and DataTables integration  
 **Solution**: Created TicketReservation and ReservationDocument models, TicketReservationController with CRUD and workflow methods (approve, reject, markBooked, markCompleted), implemented file upload/delete, added 12 permissions, created DataTables index with advanced filtering, fixed FK relationship issue (`reservation_id` vs `ticket_reservation_id`)  
 **Key Learning**: Eloquent relationship foreign keys must be explicitly specified when naming differs from convention (e.g., `reservation_id` not `ticket_reservation_id`). Removed eager loading of problematic relationships from DataTables queries to prevent FK errors.
+
+### [MEM-016] Vehicle Administration Base Implementation (2025-10-30) ✅ COMPLETE
+
+- Challenge/Decision: Introduce Vehicle module with fuel, documents, maintenance, and alerts; choose global list routes for fuel/maintenance and secure document storage.
+- Solution: Added routes, controllers, models with helpers, AdminLTE views, sidebar wiring, dashboard widgets (expiring docs, upcoming services), and secure upload/download using public disk; seeded new permissions.
+- Key Learning: Splitting sub-resources into dedicated controllers with global lists simplifies UX and navigation; enforce permissions including download; helper scopes (`expiringWithin`, `upcoming`) aid dashboard and alerts.
+
+### [MEM-017] Vehicle Pages UI Alignment & DevTools Verification (2025-10-30) ✅ COMPLETE
+
+- Challenge/Decision: Vehicle pages lacked consistent layout and table pattern vs supplies; needed quick alignment and validation using Chrome DevTools.
+- Solution: Updated `vehicles`, `fuel-records`, `maintenance` index views to use `layouts.main`, breadcrumbs, AdminLTE card-outline; added client-side DataTables with index column and responsive options; Vehicles filters (Type/Status). Verified via DevTools Elements/Network.
+- Key Learning: Standardizing layout and table options across modules speeds UX consistency; client-side DataTables is acceptable interim before server-side scaling; use `@push('js')` for script stack consistency.

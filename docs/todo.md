@@ -46,6 +46,7 @@ Include relevant context in brackets to help with future AI-assisted coding:
 -   `[ ] P2: Add Mobile-Optimized Counting Interface [admin/stock-opname/count.blade.php]`
 -   `[ ] P2: Implement Export Functionality for Stock Opname Reports [ExcelపPDF export]`
 -   `[ ] P2: Add Property Management System [waiting for next priority decision]`
+-   `[ ] P2: Vehicle Administration – migrate to server-side DataTables when datasets grow`
 
 ## Blocked/Waiting
 
@@ -70,6 +71,9 @@ Include relevant context in brackets to help with future AI-assisted coding:
 -   `[done] P0: Departments Management [DepartmentController, CRUD operations, API sync preparation] (completed: 2025-01-25)`
 -   `[done] P0: Stock Opname Module Implementation [StockOpnameController, StockOpnameItemController, session management, gradual counting] (completed: 2025-01-25)`
 -   `[done] P0: User Management Schema & Auth Update [add username, add nik, department FK, remove role enum, email/username login, update forms, seeders, guarded migrations] (completed: 2025-10-30)`
+-
+-   `[done] P1: Vehicle Administration Base Implementation [routes, controllers, models, views, permissions, dashboard widgets, document uploads] (completed: 2025-10-30)`
+-   `[done] P1: Vehicle Pages Layout Alignment & DataTables Setup [Vehicles, Fuel Records, Maintenance aligned to supplies layout; client-side DataTables with index column; filters on Vehicles] (completed: 2025-10-30)`
 
 ## Quick Notes
 

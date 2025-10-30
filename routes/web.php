@@ -15,6 +15,29 @@ Route::middleware('auth')->group(function () {
     Route::patch('users/{user}/toggle-status', [\App\Http\Controllers\UserController::class, 'toggleStatus'])->name('users.toggle-status');
 });
 
+// Vehicle Administration Routes
+Route::middleware('auth')->group(function () {
+    // Vehicle registry
+    Route::resource('vehicles', \App\Http\Controllers\Admin\VehicleController::class);
+
+    // Fuel Records - global listing and management
+    Route::resource('fuel-records', \App\Http\Controllers\Admin\FuelRecordController::class)->only([
+        'index', 'create', 'store', 'edit', 'update', 'destroy',
+    ]);
+
+    // Vehicle Maintenance - global listing and management
+    Route::resource('vehicle-maintenance', \App\Http\Controllers\Admin\VehicleMaintenanceController::class)->only([
+        'index', 'create', 'store', 'edit', 'update', 'destroy',
+    ]);
+
+    // Vehicle Documents - managed via upload/delete and secure download
+    Route::resource('vehicle-documents', \App\Http\Controllers\Admin\VehicleDocumentController::class)->only([
+        'store', 'destroy',
+    ]);
+    Route::get('vehicle-documents/{document}/download', [\App\Http\Controllers\Admin\VehicleDocumentController::class, 'download'])
+        ->name('vehicle-documents.download');
+});
+
 // Admin Routes
 Route::prefix('admin')->middleware('auth')->group(function () {
     Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class)->names([

@@ -73,4 +73,12 @@ class Vehicle extends Model
             ->where('expiry_date', '>', now())
             ->get();
     }
+
+    public function lastOdometer(): int
+    {
+        $fromVehicle = (int) $this->current_odometer;
+        $fromFuel = (int) optional($this->fuelRecords()->orderByDesc('date')->orderByDesc('id')->first())->odometer;
+        $fromMaintenance = (int) optional($this->maintenances()->orderByDesc('service_date')->orderByDesc('id')->first())->odometer;
+        return max($fromVehicle, $fromFuel, $fromMaintenance);
+    }
 }

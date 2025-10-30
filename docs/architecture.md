@@ -108,7 +108,50 @@ A comprehensive enterprise management system for GENAF company covering office s
 -   **Departments**: Department management with API sync preparation
 -   **Stock Opname**: Physical inventory count with gradual counting support
 
-### 5. Data Management
+### 5. Vehicle Administration
+
+-   Vehicles registry with CRUD and status
+-   Fuel Records with odometer and cost tracking
+-   Vehicle Documents with expiry alerts and secure file storage
+-   Vehicle Maintenance with next service scheduling
+-   Dashboard widgets for expiring docs and upcoming services
+
+#### UI Patterns (Aligned with Supplies)
+
+-   Layout: `layouts.main` with `@section('title')`, `@section('title_page')`, and `@section('breadcrumb_title')`
+-   Card: `card card-primary card-outline` header with icon and actions on the right
+-   Tables: DataTables with index column (#), `responsive: true`, `lengthChange: false`, `autoWidth: false`
+-   Filters:
+    - Vehicles: Type and Status dropdowns that filter DataTables columns
+    - Fuel/Maintenance: no filters yet (empty-state supported)
+-   Scripts stack: `@push('js')` for consistency across modules
+
+#### Routes
+
+```php
+Route::middleware('auth')->group(function () {
+    Route::resource('vehicles', \App\Http\Controllers\Admin\VehicleController::class);
+    Route::resource('fuel-records', \App\Http\Controllers\Admin\FuelRecordController::class)->only(['index','create','store','edit','update','destroy']);
+    Route::resource('vehicle-maintenance', \App\Http\Controllers\Admin\VehicleMaintenanceController::class)->only(['index','create','store','edit','update','destroy']);
+    Route::resource('vehicle-documents', \App\Http\Controllers\Admin\VehicleDocumentController::class)->only(['store','destroy']);
+    Route::get('vehicle-documents/{document}/download', [\App\Http\Controllers\Admin\VehicleDocumentController::class, 'download'])->name('vehicle-documents.download');
+});
+```
+
+#### Models
+
+-   `App\Models\Vehicle` with relations: `fuelRecords`, `documents`, `maintenances`, helper `lastOdometer()`
+-   `App\Models\FuelRecord` belongsTo `vehicle`, `recorder`
+-   `App\Models\VehicleDocument` scope `expiringWithin(days)`
+-   `App\Models\VehicleMaintenance` scope `upcoming(days)`
+
+#### Files
+
+-   Views under `resources/views/admin/vehicles/**` with AdminLTE placeholders
+-   Sidebar links wired to `vehicles.index`, `fuel-records.index`, `vehicle-maintenance.index`
+-   Dashboard small boxes for expiring documents and upcoming services
+
+### 6. Data Management
 
 -   **DataTables Integration**: Server-side processing for large datasets
 -   **Search & Filtering**: Advanced search capabilities

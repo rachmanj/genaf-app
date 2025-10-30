@@ -111,9 +111,15 @@ class RolePermissionSeeder extends Seeder
             'view fuel records',
             'create fuel records',
             'edit fuel records',
+            'delete fuel records',
             'view vehicle maintenance',
             'create vehicle maintenance',
             'edit vehicle maintenance',
+            'delete vehicle maintenance',
+            'view vehicle documents',
+            'create vehicle documents',
+            'delete vehicle documents',
+            'download vehicle documents',
 
             // Asset Inventory
             'view assets',

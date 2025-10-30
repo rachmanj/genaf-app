@@ -60,11 +60,36 @@
                         <p>Vehicles</p>
                     </div>
                     <div class="icon"><i class="fas fa-car"></i></div>
-                    <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="{{ route('vehicles.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                 </div>
             </div>
         @endcan
     </div>
+
+    @can('view vehicles')
+        <div class="row">
+            <div class="col-lg-4 col-12">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>{{ \App\Models\VehicleDocument::expiringWithin(90)->count() }}</h3>
+                        <p>Documents expiring in 90 days</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-file-alt"></i></div>
+                    <a href="{{ route('vehicles.index') }}" class="small-box-footer">Review <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-12">
+                <div class="small-box bg-primary">
+                    <div class="inner">
+                        <h3>{{ \App\Models\VehicleMaintenance::upcoming(30)->count() }}</h3>
+                        <p>Upcoming services (30 days)</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-tools"></i></div>
+                    <a href="{{ route('vehicle-maintenance.index') }}" class="small-box-footer">Review <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        </div>
+    @endcan
 
     <!-- Recent Supply Requests -->
     @can('view supply requests')
