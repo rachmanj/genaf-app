@@ -25,10 +25,11 @@
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
 
-                    <!-- Email Address -->
+                    <!-- Email Address or Username -->
                     <div class="input-group mb-3">
-                        <input type="email" class="form-control @error('email') is-invalid @enderror" name="email"
-                            value="{{ old('email') }}" placeholder="Email" required autofocus autocomplete="username">
+                        <input type="text" class="form-control @error('email') is-invalid @enderror" name="email"
+                            value="{{ old('email') }}" placeholder="Email or Username" required autofocus
+                            autocomplete="username">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>

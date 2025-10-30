@@ -517,6 +517,39 @@ Each decision follows this structure:
 
 ---
 
+## ADR-015: User Table Enhancements (username, NIK, department_id)
+
+- **Date**: 2025-10-30  
+- **Status**: Accepted  
+- **Context**: Need unique employee identifier and flexible login; align department to normalized schema.  
+- **Decision**: Add nullable unique `username` and `nik`; replace `department` string with nullable `department_id` FK to `departments`. Remove legacy `role` enum in favor of Spatie roles.  
+- **Alternatives**:
+  1. Keep string `department` and legacy `role` enum
+  2. Add only `nik` without `username`
+  3. Full normalization with FK and optional `username` (chosen)
+- **Consequences**:
+  - ✅ Normalized relation to `departments`
+  - ✅ Support enterprise identifiers via `nik`
+  - ✅ Future-proof login via `username`
+  - ⚠️ Requires migration order care (FKs after table creation)
+- **Review Date**: 2025-12-15
+
+---
+
+## ADR-016: Login with Email or Username
+
+- **Date**: 2025-10-30  
+- **Status**: Accepted  
+- **Context**: Users may prefer username or email for authentication.  
+- **Decision**: Accept a single login field and detect if it is an email (contains '@'); if yes, authenticate with `email`, otherwise with `username`. Updated validation and UI placeholder accordingly.  
+- **Consequences**:
+  - ✅ Improved UX with flexible credentials
+  - ✅ Minimal code changes scoped to `LoginRequest`
+  - ⚠️ Must ensure unique indexes on both fields
+- **Review Date**: 2025-12-15
+
+---
+
 ## Summary
 
 These architectural decisions form the foundation of the GENAF Enterprise Management System. They prioritize:

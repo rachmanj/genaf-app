@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,7 +44,11 @@ class UserController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('department', 'like', "%{$search}%");
+                    ->orWhere('username', 'like', "%{$search}%")
+                    ->orWhere('nik', 'like', "%{$search}%")
+                    ->orWhereHas('department', function ($q) use ($search) {
+                        $q->where('department_name', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -57,7 +62,7 @@ class UserController extends Controller
 
         // Filter by department
         if ($request->filled('department')) {
-            $query->where('department', $request->get('department'));
+            $query->where('department_id', $request->get('department'));
         }
 
         // Filter by status
@@ -65,11 +70,11 @@ class UserController extends Controller
             $query->where('is_active', $request->get('status') === 'active');
         }
 
-        $users = $query->orderBy('name')->paginate(15);
+        $users = $query->with('department')->orderBy('name')->paginate(15);
         $users->appends($request->query());
 
-        // Get unique departments for filter dropdown
-        $departments = User::distinct()->pluck('department')->filter()->sort()->values();
+        // Get departments for filter dropdown
+        $departments = Department::active()->orderBy('department_name')->get();
 
         return view('users.index', compact('users', 'departments'));
     }
@@ -83,7 +88,7 @@ class UserController extends Controller
             abort(403, 'You do not have permission to create users.');
         }
 
-        $departments = ['IT', 'HR', 'Finance', 'Operations', 'Sales', 'Marketing', 'General'];
+        $departments = Department::active()->orderBy('department_name')->get();
         $roles = \Spatie\Permission\Models\Role::all()->pluck('name', 'name');
 
         return view('users.create', compact('departments', 'roles'));
@@ -102,8 +107,10 @@ class UserController extends Controller
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
+                'username' => $request->username,
                 'password' => Hash::make($request->password),
-                'department' => $request->department,
+                'nik' => $request->nik,
+                'department_id' => $request->department_id,
                 'phone' => $request->phone,
                 'is_active' => $request->boolean('is_active', true),
             ]);
@@ -159,7 +166,7 @@ class UserController extends Controller
             abort(403, 'You do not have permission to edit users.');
         }
 
-        $departments = ['IT', 'HR', 'Finance', 'Operations', 'Sales', 'Marketing', 'General'];
+        $departments = Department::active()->orderBy('department_name')->get();
         $roles = \Spatie\Permission\Models\Role::all()->pluck('name', 'name');
 
         return view('users.edit', compact('user', 'departments', 'roles'));
@@ -178,7 +185,9 @@ class UserController extends Controller
             $updateData = [
                 'name' => $request->name,
                 'email' => $request->email,
-                'department' => $request->department,
+                'username' => $request->username,
+                'nik' => $request->nik,
+                'department_id' => $request->department_id,
                 'phone' => $request->phone,
                 'is_active' => $request->boolean('is_active', true),
             ];

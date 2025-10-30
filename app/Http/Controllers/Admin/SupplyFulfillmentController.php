@@ -22,7 +22,18 @@ class SupplyFulfillmentController extends Controller
                 ->select('supply_requests.*');
 
             return DataTables::of($requests)
-                ->addIndexColumn()
+                ->addColumn('index', function ($request) {
+                    return '';
+                })
+                ->addColumn('request_id', function ($request) {
+                    return $request->id;
+                })
+                ->addColumn('items_count', function ($request) {
+                    return $request->items->count();
+                })
+                ->addColumn('status_badge', function ($request) {
+                    return '<span class="badge badge-success">Approved</span>';
+                })
                 ->addColumn('department_name', function ($request) {
                     return $request->department->department_name ?? 'N/A';
                 })
@@ -45,7 +56,7 @@ class SupplyFulfillmentController extends Controller
                     $actions .= '</div>';
                     return $actions;
                 })
-                ->rawColumns(['actions'])
+                ->rawColumns(['actions', 'status_badge'])
                 ->make(true);
         }
 

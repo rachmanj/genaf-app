@@ -93,28 +93,12 @@
 
                 <!-- Ticket Reservations -->
                 @can('view ticket reservations')
-                    <li class="nav-item {{ request()->routeIs('tickets.*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs('tickets.*') ? 'active' : '' }}">
+                    <li class="nav-item">
+                        <a href="{{ route('ticket-reservations.index') }}"
+                            class="nav-link {{ request()->routeIs('ticket-reservations.*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-ticket-alt"></i>
-                            <p>
-                                Ticket Reservations
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
+                            <p>Ticket Reservations</p>
                         </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Flight Bookings</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Hotel Reservations</p>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                 @endcan
 

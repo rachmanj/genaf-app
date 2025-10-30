@@ -102,7 +102,7 @@
     </div>
 @endsection
 
-@push('scripts')
+@push('js')
     <script>
         $(document).ready(function() {
             var table = $('#tbl-supply-requests').DataTable({
@@ -113,7 +113,7 @@
                     type: 'GET'
                 },
                 columns: [{
-                        data: null,
+                        data: 'index',
                         name: 'index',
                         orderable: false,
                         searchable: false
@@ -165,16 +165,6 @@
                 language: {
                     processing: "Loading..."
                 }
-            });
-
-            // Add index column
-            table.on('draw', function() {
-                table.column(0, {
-                    search: 'applied',
-                    order: 'applied'
-                }).nodes().each(function(cell, i) {
-                    cell.innerHTML = i + 1;
-                });
             });
 
             // Status filter
@@ -287,7 +277,7 @@
                                 if (requestData.items && requestData.items.length > 0) {
                                     requestData.items.forEach(function(item) {
                                         approvedQuantities.push(item
-                                        .quantity); // Approve full quantity
+                                            .quantity); // Approve full quantity
                                     });
                                 }
 
@@ -490,7 +480,7 @@
                                 if (requestData.items && requestData.items.length > 0) {
                                     requestData.items.forEach(function(item) {
                                         approvedQuantities.push(item
-                                        .quantity); // Approve full quantity
+                                            .quantity); // Approve full quantity
                                     });
                                 }
 

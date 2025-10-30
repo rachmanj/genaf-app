@@ -54,6 +54,18 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
+                                            <label for="username">Username</label>
+                                            <input type="text"
+                                                class="form-control @error('username') is-invalid @enderror" id="username"
+                                                name="username" value="{{ old('username') }}">
+                                            @error('username')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
                                             <label for="nik">NIK (Nomor Induk Karyawan)</label>
                                             <input type="text" class="form-control @error('nik') is-invalid @enderror"
                                                 id="nik" name="nik" value="{{ old('nik') }}">
@@ -62,7 +74,9 @@
                                             @enderror
                                         </div>
                                     </div>
+                                </div>
 
+                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="phone">Phone Number</label>
@@ -120,18 +134,18 @@
 
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="department">Department <span class="text-danger">*</span></label>
-                                            <select class="form-control @error('department') is-invalid @enderror"
-                                                id="department" name="department" required>
+                                            <label for="department_id">Department</label>
+                                            <select class="form-control @error('department_id') is-invalid @enderror"
+                                                id="department_id" name="department_id">
                                                 <option value="">Select Department</option>
                                                 @foreach ($departments as $dept)
-                                                    <option value="{{ $dept }}"
-                                                        {{ old('department') === $dept ? 'selected' : '' }}>
-                                                        {{ $dept }}
+                                                    <option value="{{ $dept->id }}"
+                                                        {{ old('department_id') == $dept->id ? 'selected' : '' }}>
+                                                        {{ $dept->department_name }}
                                                     </option>
                                                 @endforeach
                                             </select>
-                                            @error('department')
+                                            @error('department_id')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>

@@ -60,9 +60,9 @@
                                         <select name="department" class="form-control">
                                             <option value="">All Departments</option>
                                             @foreach ($departments as $dept)
-                                                <option value="{{ $dept }}"
-                                                    {{ request('department') == $dept ? 'selected' : '' }}>
-                                                    {{ $dept }}
+                                                <option value="{{ $dept->id }}"
+                                                    {{ request('department') == $dept->id ? 'selected' : '' }}>
+                                                    {{ $dept->department_name }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -129,7 +129,7 @@
                                                     <span class="badge badge-info">{{ ucfirst($role->name) }}</span>
                                                 @endforeach
                                             </td>
-                                            <td>{{ $user->department ?? 'N/A' }}</td>
+                                            <td>{{ $user->department?->department_name ?? 'N/A' }}</td>
                                             <td>{{ $user->phone ?? 'N/A' }}</td>
                                             <td>
                                                 @if ($user->is_active)

@@ -26,10 +26,11 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $userId,
+            'username' => 'nullable|string|max:255|unique:users,username,' . $userId,
             'nik' => 'nullable|string|max:255|unique:users,nik,' . $userId,
             'password' => 'nullable|string|min:8|confirmed',
             'role' => 'required|exists:roles,name',
-            'department' => 'required|string|max:255',
+            'department_id' => 'nullable|exists:departments,id',
             'phone' => 'nullable|string|max:20',
             'is_active' => 'boolean',
         ];
@@ -44,12 +45,13 @@ class UpdateUserRequest extends FormRequest
             'name.required' => 'The name field is required.',
             'email.required' => 'The email field is required.',
             'email.unique' => 'This email address is already in use.',
+            'username.unique' => 'This username is already in use.',
             'nik.unique' => 'This NIK is already registered.',
             'password.min' => 'The password must be at least 8 characters.',
             'password.confirmed' => 'The password confirmation does not match.',
             'role.required' => 'The role field is required.',
-            'role.in' => 'The selected role is invalid.',
-            'department.required' => 'The department field is required.',
+            'role.exists' => 'The selected role is invalid.',
+            'department_id.exists' => 'The selected department is invalid.',
         ];
     }
 }

@@ -129,6 +129,17 @@ Route::middleware('auth')->group(function () {
     Route::post('departments/{department}/toggle-status', [\App\Http\Controllers\Admin\DepartmentController::class, 'toggleStatus'])->name('departments.toggle-status');
 });
 
+// Ticket Reservations Routes
+Route::middleware('auth')->group(function () {
+    Route::resource('ticket-reservations', \App\Http\Controllers\Admin\TicketReservationController::class);
+    Route::post('ticket-reservations/{ticketReservation}/approve', [\App\Http\Controllers\Admin\TicketReservationController::class, 'approve'])->name('ticket-reservations.approve');
+    Route::post('ticket-reservations/{ticketReservation}/reject', [\App\Http\Controllers\Admin\TicketReservationController::class, 'reject'])->name('ticket-reservations.reject');
+    Route::post('ticket-reservations/{ticketReservation}/mark-booked', [\App\Http\Controllers\Admin\TicketReservationController::class, 'markBooked'])->name('ticket-reservations.mark-booked');
+    Route::post('ticket-reservations/{ticketReservation}/mark-completed', [\App\Http\Controllers\Admin\TicketReservationController::class, 'markCompleted'])->name('ticket-reservations.mark-completed');
+    Route::post('ticket-reservations/{ticketReservation}/upload-document', [\App\Http\Controllers\Admin\TicketReservationController::class, 'uploadDocument'])->name('ticket-reservations.upload-document');
+    Route::delete('ticket-reservations/{ticketReservation}/delete-document/{document}', [\App\Http\Controllers\Admin\TicketReservationController::class, 'deleteDocument'])->name('ticket-reservations.delete-document');
+});
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

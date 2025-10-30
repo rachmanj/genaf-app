@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Supply;
 use App\Models\SupplyTransaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
 class SupplyTransactionController extends Controller
@@ -58,7 +59,9 @@ class SupplyTransactionController extends Controller
                     $actions = '<div class="btn-group" role="group">';
                     $actions .= '<a href="' . route('supplies.transactions.show', $transaction) . '" class="btn btn-info btn-sm" title="View"><i class="fas fa-eye"></i></a>';
 
-                    if (auth()->user()->can('delete supply transactions')) {
+                    /** @var \App\Models\User|null $user */
+                    $user = Auth::user();
+                    if ($user && $user->can('delete supply transactions')) {
                         $actions .= '<button type="button" class="btn btn-danger btn-sm" onclick="deleteTransaction(' . $transaction->id . ')" title="Delete"><i class="fas fa-trash"></i></button>';
                     }
 
@@ -114,7 +117,7 @@ class SupplyTransactionController extends Controller
             'reference_no' => $request->reference_no,
             'transaction_date' => $request->transaction_date,
             'notes' => $request->notes,
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
         ]);
 
         // Update supply stock

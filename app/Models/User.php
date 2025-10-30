@@ -20,9 +20,9 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'username',
         'password',
         'nik',
-        'department',
         'department_id',
         'phone',
         'is_active',
@@ -103,5 +103,13 @@ class User extends Authenticatable
     public function supplyTransactions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(SupplyTransaction::class, 'user_id');
+    }
+
+    /**
+     * Get the ticket reservations made by this user.
+     */
+    public function ticketReservations(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(TicketReservation::class, 'employee_id');
     }
 }

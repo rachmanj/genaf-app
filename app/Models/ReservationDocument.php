@@ -30,7 +30,7 @@ class ReservationDocument extends Model
      */
     public function reservation(): BelongsTo
     {
-        return $this->belongsTo(TicketReservation::class);
+        return $this->belongsTo(TicketReservation::class, 'reservation_id');
     }
 
     /**

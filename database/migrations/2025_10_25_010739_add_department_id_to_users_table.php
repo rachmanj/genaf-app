@@ -12,7 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('department_id')->nullable()->constrained('departments')->onDelete('set null');
+            if (!Schema::hasColumn('users', 'department_id')) {
+                $table->foreignId('department_id')->nullable();
+            }
+        });
+
+        // Add the foreign key in a separate schema call to avoid issues on some drivers
+        Schema::table('users', function (Blueprint $table) {
+            if (Schema::hasColumn('users', 'department_id')) {
+                $table->foreign('department_id')->references('id')->on('departments')->nullOnDelete();
+            }
         });
     }
 
@@ -22,8 +31,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign(['department_id']);
-            $table->dropColumn('department_id');
+            if (Schema::hasColumn('users', 'department_id')) {
+                // Drop FK first if exists, then the column
+                try {
+                    $table->dropForeign(['department_id']);
+                } catch (\Throwable $e) {
+                    // ignore
+                }
+                $table->dropColumn('department_id');
+            }
         });
     }
 };

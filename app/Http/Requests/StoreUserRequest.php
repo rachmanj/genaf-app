@@ -42,13 +42,14 @@ class StoreUserRequest extends FormRequest
             'name.required' => 'The name field is required.',
             'email.required' => 'The email field is required.',
             'email.unique' => 'This email address is already in use.',
+            'username.unique' => 'This username is already in use.',
             'nik.unique' => 'This NIK is already registered.',
             'password.required' => 'The password field is required.',
             'password.min' => 'The password must be at least 8 characters.',
             'password.confirmed' => 'The password confirmation does not match.',
             'role.required' => 'The role field is required.',
-            'role.in' => 'The selected role is invalid.',
-            'department.required' => 'The department field is required.',
+            'role.exists' => 'The selected role is invalid.',
+            'department_id.exists' => 'The selected department is invalid.',
         ];
     }
 }

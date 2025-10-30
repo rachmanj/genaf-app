@@ -92,3 +92,15 @@
 **Challenge**: Implement physical inventory count system with gradual counting, save progress, and complete later functionality
 **Solution**: Created StockOpnameSession/Items models with status workflow (pending → counting → counted → verified), implemented saveDraft and finalizeCount methods, added photo evidence upload, variance calculation with reason codes, automatic stock adjustment after approval
 **Key Learning**: Gradual counting with draft save enables realistic stock opname workflows - items can be in 'counting' status (work-in-progress) before finalization, concurrent counting supported, status-based workflow provides clear progress tracking
+
+### [MEM-014] User Schema & Login Update (2025-10-30) ✅ COMPLETE
+
+-   Challenge/Decision: Add `username` (nullable, unique) and `nik` (nullable, unique); change `department` to `department_id` FK; enable login via email or username; remove legacy `role` enum.
+-   Solution: Updated base users migration; requests validation; controller and views; login detection in `LoginRequest`; updated seeder; guarded later migrations (drop role, add nik, add department_id) to be idempotent; deferred FK creation where needed.
+-   Key Learning: When modifying base tables, later delta migrations must guard for presence/absence to support migrate:fresh; FK constraints must respect creation order or be added after both tables exist.
+
+### [MEM-015] Ticket Reservations Module Implementation (2025-10-30) ✅ COMPLETE
+
+**Challenge**: Build ticket reservation system with approval workflow, document management, and DataTables integration  
+**Solution**: Created TicketReservation and ReservationDocument models, TicketReservationController with CRUD and workflow methods (approve, reject, markBooked, markCompleted), implemented file upload/delete, added 12 permissions, created DataTables index with advanced filtering, fixed FK relationship issue (`reservation_id` vs `ticket_reservation_id`)  
+**Key Learning**: Eloquent relationship foreign keys must be explicitly specified when naming differs from convention (e.g., `reservation_id` not `ticket_reservation_id`). Removed eager loading of problematic relationships from DataTables queries to prevent FK errors.

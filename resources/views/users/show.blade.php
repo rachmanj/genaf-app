@@ -42,13 +42,24 @@
                                 </div>
 
                                 <div>
+                                    <label class="block text-sm font-medium text-gray-700">Username</label>
+                                    <p class="mt-1 text-sm text-gray-900">{{ $user->username ?? 'Not provided' }}</p>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">NIK</label>
+                                    <p class="mt-1 text-sm text-gray-900">{{ $user->nik ?? 'Not provided' }}</p>
+                                </div>
+
+                                <div>
                                     <label class="block text-sm font-medium text-gray-700">Phone</label>
                                     <p class="mt-1 text-sm text-gray-900">{{ $user->phone ?? 'Not provided' }}</p>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Department</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ $user->department ?? 'Not assigned' }}</p>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ $user->department?->department_name ?? 'Not assigned' }}</p>
                                 </div>
                             </div>
                         </div>

@@ -77,7 +77,7 @@
     </section>
 @endsection
 
-@push('scripts')
+@push('js')
     <script>
         $(document).ready(function() {
             var table = $('#tbl-stock-opname').DataTable({
@@ -93,8 +93,8 @@
                     }
                 },
                 columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
+                        data: 'index',
+                        name: 'index',
                         orderable: false,
                         searchable: false
                     },

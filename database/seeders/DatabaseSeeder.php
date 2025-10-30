@@ -13,20 +13,23 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // First, create roles and permissions
+        // First, create roles/permissions and master data
         $this->call([
             RolePermissionSeeder::class,
+            DepartmentSeeder::class,
             SupplySeeder::class,
             RoomSeeder::class,
             VehicleSeeder::class,
+            TicketReservationSeeder::class,
         ]);
 
         // Create users and assign roles
         $adminUser = User::create([
             'name' => 'Admin User',
             'email' => 'admin@genaf.com',
+            'username' => 'admin',
             'password' => bcrypt('password'),
-            'department' => 'IT',
+            'department_id' => null,
             'phone' => '+62-123-456-7890',
             'is_active' => true,
         ]);
@@ -35,8 +38,9 @@ class DatabaseSeeder extends Seeder
         $managerUser = User::create([
             'name' => 'Manager User',
             'email' => 'manager@genaf.com',
+            'username' => 'manager',
             'password' => bcrypt('password'),
-            'department' => 'Operations',
+            'department_id' => null,
             'phone' => '+62-123-456-7891',
             'is_active' => true,
         ]);
@@ -45,8 +49,9 @@ class DatabaseSeeder extends Seeder
         $employeeUser = User::create([
             'name' => 'Employee User',
             'email' => 'employee@genaf.com',
+            'username' => 'employee',
             'password' => bcrypt('password'),
-            'department' => 'Sales',
+            'department_id' => null,
             'phone' => '+62-123-456-7892',
             'is_active' => true,
         ]);

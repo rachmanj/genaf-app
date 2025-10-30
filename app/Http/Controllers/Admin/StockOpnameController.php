@@ -20,7 +20,9 @@ class StockOpnameController extends Controller
                 ->select('stock_opname_sessions.*');
 
             return DataTables::of($sessions)
-                ->addIndexColumn()
+                ->addColumn('index', function ($session) {
+                    return '';
+                })
                 ->addColumn('session_code', function ($session) {
                     return '<strong>' . $session->session_code . '</strong>';
                 })

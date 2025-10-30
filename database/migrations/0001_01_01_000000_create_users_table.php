@@ -16,9 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('username')->nullable()->unique();
             $table->string('password');
-            $table->enum('role', ['admin', 'manager', 'employee'])->default('employee');
-            $table->string('department')->nullable();
+            $table->string('nik')->nullable()->unique();
+            $table->foreignId('department_id')->nullable()->index();
             $table->string('phone')->nullable();
             $table->boolean('is_active')->default(true);
             $table->rememberToken();

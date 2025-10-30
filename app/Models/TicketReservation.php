@@ -57,7 +57,7 @@ class TicketReservation extends Model
      */
     public function documents(): HasMany
     {
-        return $this->hasMany(ReservationDocument::class);
+        return $this->hasMany(ReservationDocument::class, 'reservation_id');
     }
 
     /**

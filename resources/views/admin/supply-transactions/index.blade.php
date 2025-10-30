@@ -82,7 +82,7 @@
     </section>
 @endsection
 
-@push('scripts')
+@section('scripts')
     <script>
         $(document).ready(function() {
             var table = $('#tbl-supply-transactions').DataTable({
@@ -90,10 +90,13 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ route('supplies.transactions.index') }}",
-                    type: 'GET'
+                    type: 'GET',
+                    data: function(d) {
+                        d._token = '{{ csrf_token() }}';
+                    }
                 },
                 columns: [{
-                        data: null,
+                        data: 'index',
                         name: 'index',
                         orderable: false,
                         searchable: false
@@ -148,15 +151,6 @@
                 }
             });
 
-            // Add index column
-            table.on('draw', function() {
-                table.column(0, {
-                    search: 'applied',
-                    order: 'applied'
-                }).nodes().each(function(cell, i) {
-                    cell.innerHTML = i + 1;
-                });
-            });
 
             // Type filter
             $('#filter-type').on('change', function() {
@@ -236,4 +230,4 @@
             @endif
         });
     </script>
-@endpush
+@stop

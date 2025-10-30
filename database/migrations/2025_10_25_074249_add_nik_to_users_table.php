@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('nik')->nullable()->unique()->after('email');
+            if (!Schema::hasColumn('users', 'nik')) {
+                $table->string('nik')->nullable()->unique()->after('email');
+            }
         });
     }
 
@@ -22,8 +24,14 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropUnique(['nik']);
-            $table->dropColumn('nik');
+            if (Schema::hasColumn('users', 'nik')) {
+                try {
+                    $table->dropUnique(['nik']);
+                } catch (\Throwable $e) {
+                    // ignore
+                }
+                $table->dropColumn('nik');
+            }
         });
     }
 };

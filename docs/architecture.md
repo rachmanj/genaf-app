@@ -126,41 +126,15 @@ users
 ├── id (primary key)
 ├── name
 ├── email (unique)
-├── email_verified_at
+├── email_verified_at (nullable)
+├── username (nullable, unique)
 ├── password
-├── phone
-├── department
+├── nik (nullable, unique)
+├── department_id (nullable, index → departments.id)
+├── phone (nullable)
 ├── is_active (boolean)
 ├── created_at
 └── updated_at
-
-roles
-├── id (primary key)
-├── name (unique)
-├── guard_name
-├── created_at
-└── updated_at
-
-permissions
-├── id (primary key)
-├── name (unique)
-├── guard_name
-├── created_at
-└── updated_at
-
-model_has_roles (Spatie package)
-├── role_id
-├── model_type
-└── model_id
-
-model_has_permissions (Spatie package)
-├── permission_id
-├── model_type
-└── model_id
-
-role_has_permissions (Spatie package)
-├── permission_id
-└── role_id
 ```
 
 #### Office Supplies
@@ -358,6 +332,19 @@ graph TD
     K --> L[Database Query]
     L --> M[JSON Response]
     M --> N[Table Update]
+```
+
+### Authentication Input Flow (Email or Username)
+
+```mermaid
+flowchart TD
+    L[Login form: email or username + password] --> D{Input contains '@'?}
+    D -- yes --> E[Field := email]
+    D -- no --> U[Field := username]
+    E --> A[Auth::attempt({email,password})]
+    U --> A[Auth::attempt({username,password})]
+    A -->|success| R[Redirect to dashboard]
+    A -->|failure| F[Return with auth.failed]
 ```
 
 ## Security Implementation
