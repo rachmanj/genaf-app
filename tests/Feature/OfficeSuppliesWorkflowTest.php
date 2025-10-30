@@ -27,12 +27,18 @@ class OfficeSuppliesWorkflowTest extends TestCase
         // Seed roles and permissions
         $this->artisan('db:seed', ['--class' => 'RolePermissionSeeder']);
 
+        // Create test department
+        $department = Department::factory()->create([
+            'department_name' => 'IT Department',
+            'department_code' => 'IT',
+        ]);
+
         // Create test users with proper roles
         $this->admin = User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@test.com',
             'password' => Hash::make('password'),
-            'department' => 'IT'
+            'department_id' => $department->id
         ]);
         $this->admin->assignRole('admin');
 
@@ -40,7 +46,7 @@ class OfficeSuppliesWorkflowTest extends TestCase
             'name' => 'Department Head',
             'email' => 'depthead@test.com',
             'password' => Hash::make('password'),
-            'department' => 'IT'
+            'department_id' => $department->id
         ]);
         $this->deptHead->assignRole('manager');
 
@@ -48,7 +54,7 @@ class OfficeSuppliesWorkflowTest extends TestCase
             'name' => 'Employee User',
             'email' => 'employee@test.com',
             'password' => Hash::make('password'),
-            'department' => 'IT'
+            'department_id' => $department->id
         ]);
         $this->employee->assignRole('employee');
 
