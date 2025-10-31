@@ -573,9 +573,6 @@ genaf-app/
 
 #### 🚧 Next Priority Tasks
 
--   [ ] Stock transaction system (in/out recording, transaction history, reference numbers)
--   [ ] Supply request workflow (employee requests, manager approval, fulfillment tracking)
--   [ ] Ticket reservation requests, approval workflow, booking history, document uploads
 -   [ ] Room management, reservations, check-in/out, occupancy calculation, room maintenance
 -   [ ] Vehicle management, fuel recording, document tracking with expiry alerts, maintenance history, service schedules
 -   [ ] Asset inventory with QR codes, maintenance tracking, transfer/relocation history, depreciation calculation

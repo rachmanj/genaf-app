@@ -15,6 +15,19 @@ Route::middleware('auth')->group(function () {
     Route::patch('users/{user}/toggle-status', [\App\Http\Controllers\UserController::class, 'toggleStatus'])->name('users.toggle-status');
 });
 
+// PMS Routes
+Route::prefix('pms')->middleware('auth')->name('pms.')->group(function () {
+    Route::resource('buildings', \App\Http\Controllers\Admin\BuildingController::class);
+    Route::get('buildings/search', [\App\Http\Controllers\Admin\BuildingController::class, 'search'])->name('buildings.search');
+    Route::resource('rooms', \App\Http\Controllers\Admin\RoomController::class);
+    // Dependent select endpoint
+    Route::get('buildings/{building}/rooms', [\App\Http\Controllers\Admin\RoomController::class, 'byBuilding'])->name('buildings.rooms');
+
+    // Reservations
+    Route::resource('reservations', \App\Http\Controllers\Admin\RoomReservationController::class)->only(['index','create','store']);
+    Route::post('reservations/check-availability', [\App\Http\Controllers\Admin\RoomReservationController::class, 'checkAvailability'])->name('reservations.check-availability');
+});
+
 // Vehicle Administration Routes
 Route::middleware('auth')->group(function () {
     // Vehicle registry

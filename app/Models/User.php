@@ -73,6 +73,11 @@ class User extends Authenticatable
         return $this->hasAnyRole(['admin', 'manager']);
     }
 
+    public function canViewAllDepartments(): bool
+    {
+        return $this->hasAnyRole(['admin', 'ga admin']);
+    }
+
     /**
      * Get the department that the user belongs to.
      */

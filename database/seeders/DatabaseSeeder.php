@@ -17,13 +17,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolePermissionSeeder::class,
             DepartmentSeeder::class,
-            SupplySeeder::class,
-            RoomSeeder::class,
-            VehicleSeeder::class,
-            TicketReservationSeeder::class,
         ]);
 
-        // Create users and assign roles
+        // Create users and assign roles BEFORE other seeders that reference users
         $adminUser = User::create([
             'name' => 'Admin User',
             'email' => 'admin@genaf.com',
@@ -56,5 +52,73 @@ class DatabaseSeeder extends Seeder
             'is_active' => true,
         ]);
         $employeeUser->assignRole('employee');
+
+        // Create test users with specific departments for department-based filtering tests
+        $gaAdminUser = User::create([
+            'name' => 'GA Admin User',
+            'email' => 'gaadmin@genaf.com',
+            'username' => 'gaadmin',
+            'password' => bcrypt('password'),
+            'department_id' => null, // GA Admin has no specific department - can see all
+            'phone' => '+62-123-456-7893',
+            'is_active' => true,
+        ]);
+        $gaAdminUser->assignRole('ga admin');
+
+        // Department Head for Finance department (department_id = 7 based on DepartmentSeeder)
+        $deptHeadFinance = User::create([
+            'name' => 'Finance Dept Head',
+            'email' => 'finance.depthead@genaf.com',
+            'username' => 'finance_depthead',
+            'password' => bcrypt('password'),
+            'department_id' => 7,
+            'phone' => '+62-123-456-7894',
+            'is_active' => true,
+        ]);
+        $deptHeadFinance->assignRole('department head');
+
+        // Department Head for IT department (department_id = 16)
+        $deptHeadIT = User::create([
+            'name' => 'IT Dept Head',
+            'email' => 'it.depthead@genaf.com',
+            'username' => 'it_depthead',
+            'password' => bcrypt('password'),
+            'department_id' => 16,
+            'phone' => '+62-123-456-7895',
+            'is_active' => true,
+        ]);
+        $deptHeadIT->assignRole('department head');
+
+        // Employee in Finance department
+        $employeeFinance = User::create([
+            'name' => 'Finance Employee',
+            'email' => 'finance.employee@genaf.com',
+            'username' => 'finance_employee',
+            'password' => bcrypt('password'),
+            'department_id' => 7,
+            'phone' => '+62-123-456-7896',
+            'is_active' => true,
+        ]);
+        $employeeFinance->assignRole('employee');
+
+        // Employee in IT department
+        $employeeIT = User::create([
+            'name' => 'IT Employee',
+            'email' => 'it.employee@genaf.com',
+            'username' => 'it_employee',
+            'password' => bcrypt('password'),
+            'department_id' => 16,
+            'phone' => '+62-123-456-7897',
+            'is_active' => true,
+        ]);
+        $employeeIT->assignRole('employee');
+
+        // Now create other master data that may reference users
+        $this->call([
+            SupplySeeder::class,
+            VehicleSeeder::class,
+            TicketReservationSeeder::class,
+            PmsSeeder::class,
+        ]);
     }
 }

@@ -1,3 +1,9 @@
+- 2025-10-30: PMS Buildings & Rooms
+  - Decision: Floors modeled as integer on `rooms`; no separate floors table.
+  - Rationale: Simpler queries/filters; future-proof to add table if needed.
+  - Decision: Unique `(building_id, room_number)`; allows same numbers across buildings.
+  - Decision: Per-building timezone stored as string; default to app timezone if blank.
+  - Decision: Overlap check for reservations uses interval logic `(check_in < end && check_out > start)` and considers statuses: pending, confirmed, checked_in.
 # Architectural Decision Records (ADR)
 
 ## Purpose

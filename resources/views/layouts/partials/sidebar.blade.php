@@ -137,8 +137,8 @@
 
                 <!-- Property Management -->
                 @can('view rooms')
-                    <li class="nav-item {{ request()->routeIs('rooms.*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs('rooms.*') ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->routeIs('rooms.*') || request()->routeIs('pms.*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('rooms.*') || request()->routeIs('pms.*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-bed"></i>
                             <p>
                                 Property Management
@@ -146,6 +146,12 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('pms.buildings.index') }}" class="nav-link {{ request()->routeIs('pms.buildings.*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Buildings</p>
+                                </a>
+                            </li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>

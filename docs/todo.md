@@ -1,3 +1,9 @@
+- PMS
+  - Buildings CRUD: Completed (visible in sidebar), Filters, Pagination
+  - Rooms CRUD: Completed with Building filter; Select2 + async building search
+  - Reservations: Dependent selects (building→room), availability validation, date-range picker, UX safeguards
+  - Metrics: Per-building occupancy and 30-day maintenance costs on building detail
+  - Next: Maintenance CRUD; PMS dashboard widgets; reporting
 # GENAF Enterprise Management System - Current Tasks
 
 **Purpose**: Track current work and immediate priorities  
@@ -55,6 +61,7 @@ Include relevant context in brackets to help with future AI-assisted coding:
 ## Recently Completed
 
 -   `[done] P1: Create comprehensive test scenario for Office Supplies module [8 tests, complete workflow] (completed: 2025-01-26)`
+-   `[done] P1: Department-Based Supply Request Scoping & Security [canViewAllDepartments helper, filtering, security checks] (completed: 2025-01-30)`
 -   `[done] P2: Implement Ticket Reservation Module [CRUD operations, approval workflow, document management, DataTables integration] (completed: 2025-10-30)`
 
 -   `[done] P0: Complete Module 1 - Users, Roles & Permissions Management [UserController, RoleController, PermissionController, AdminLTE views] (completed: 2025-01-24)`

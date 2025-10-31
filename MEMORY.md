@@ -116,3 +116,15 @@
 - Challenge/Decision: Vehicle pages lacked consistent layout and table pattern vs supplies; needed quick alignment and validation using Chrome DevTools.
 - Solution: Updated `vehicles`, `fuel-records`, `maintenance` index views to use `layouts.main`, breadcrumbs, AdminLTE card-outline; added client-side DataTables with index column and responsive options; Vehicles filters (Type/Status). Verified via DevTools Elements/Network.
 - Key Learning: Standardizing layout and table options across modules speeds UX consistency; client-side DataTables is acceptable interim before server-side scaling; use `@push('js')` for script stack consistency.
+
+### [MEM-018] Department-Based Supply Request Scoping & Security (2025-01-30) ✅ COMPLETE
+
+- Challenge/Decision: Implement department-based visibility and approval security for supply requests - users should only see/approve requests from their department unless they're admin/ga admin.
+- Solution: Added `canViewAllDepartments()` helper to User model checking for admin/ga admin roles, implemented department filtering in SupplyRequestController index method, added security checks in approveDeptHead and rejectDeptHead methods preventing cross-department approvals.
+- Key Learning: Explicit role checks using `canViewAllDepartments()` pattern centralizes authorization logic, department filtering at query level ensures data never reaches unauthorized users, security checks in action methods provide defense-in-depth against potential exploits.
+
+### [MEM-019] Department Filtering Browser Testing & Data Integrity Fix (2025-01-31) ✅ COMPLETE
+
+- Challenge/Decision: Validate department-based filtering with real browser testing, discovered Finance users incorrectly assigned to department 7 (Design & Construction) instead of department 8 (Finance).
+- Solution: Conducted comprehensive browser tests with Finance Employee and Finance Dept Head roles, verified filtering works correctly, discovered and fixed department_id mismatch by updating user assignments to correct department.
+- Key Learning: Browser testing with realistic user data reveals data integrity issues that schema/unit tests miss, always verify seed data matches intended test scenarios, department_id validation critical for proper access control.

@@ -19,6 +19,11 @@ class SupplyRequestController extends Controller
             $query = SupplyRequest::with(['employee', 'department', 'departmentHeadApprover', 'gaAdminApprover', 'items.supply'])
                 ->select('supply_requests.*');
 
+            // Filter by department for non-admin/ga-admin users
+            if (!auth()->user()->canViewAllDepartments()) {
+                $query->where('department_id', auth()->user()->department_id);
+            }
+
             return DataTables::of($query)
                 ->addColumn('index', function ($request) {
                     return '';
@@ -257,6 +262,12 @@ class SupplyRequestController extends Controller
             return response()->json(['error' => 'Request cannot be approved by department head.'], 400);
         }
 
+        // Security check: Department heads can only approve requests from their own department
+        if (!auth()->user()->canViewAllDepartments() && 
+            $supplyRequest->department_id !== auth()->user()->department_id) {
+            return response()->json(['error' => 'You can only approve requests from your own department.'], 403);
+        }
+
         $supplyRequest->update([
             'status' => 'pending_ga_admin',
             'department_head_approved_by' => auth()->id(),
@@ -270,6 +281,12 @@ class SupplyRequestController extends Controller
     {
         if (!$supplyRequest->canBeDeptHeadRejected()) {
             return response()->json(['error' => 'Request cannot be rejected by department head.'], 400);
+        }
+
+        // Security check: Department heads can only reject requests from their own department
+        if (!auth()->user()->canViewAllDepartments() && 
+            $supplyRequest->department_id !== auth()->user()->department_id) {
+            return response()->json(['error' => 'You can only reject requests from your own department.'], 403);
         }
 
         $request->validate([

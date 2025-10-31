@@ -1,3 +1,55 @@
+## PMS (Property Management System)
+
+Current state:
+- Entities: `buildings`, `rooms`, `room_reservations`, `room_maintenances`.
+- Relationships: Building (1) → Rooms (n); Room (1) → Reservations (n); Room (1) → Maintenances (n).
+- Unique constraint: rooms unique per building by `(building_id, room_number)`.
+- Endpoints:
+  - `GET /pms/buildings`, CRUD
+  - `GET /pms/rooms`, CRUD
+  - `GET /pms/buildings/{building}/rooms` (dependent select)
+  - `POST /pms/reservations/check-availability` (overlap validation)
+  - `GET /pms/reservations` (index), `GET /pms/reservations/create`, `POST /pms/reservations`
+
+Mermaid diagram:
+```
+erDiagram
+  BUILDINGS ||--o{ ROOMS : has
+  ROOMS ||--o{ ROOM_RESERVATIONS : has
+  ROOMS ||--o{ ROOM_MAINTENANCES : has
+
+  BUILDINGS {
+    int id PK
+    string code UK
+    string name
+    string city
+    string status
+  }
+  ROOMS {
+    int id PK
+    int building_id FK
+    string room_number
+    string room_type
+    int floor
+    int capacity
+    string status
+    decimal daily_rate
+  }
+  ROOM_RESERVATIONS {
+    int id PK
+    int room_id FK
+    date check_in
+    date check_out
+    string status
+  }
+  ROOM_MAINTENANCES {
+    int id PK
+    int room_id FK
+    date scheduled_date
+    date completed_date
+    decimal cost
+  }
+```
 Purpose: Technical reference for understanding system design and development patterns
 Last Updated: [Auto-updated by AI]
 
@@ -405,6 +457,8 @@ flowchart TD
 -   **Permission Checks**: Middleware and Blade directives
 -   **Route Protection**: Permission-based route access
 -   **View Security**: `@can` directives control UI elements
+-   **Department-Based Data Scoping**: Users with admin/ga admin roles can view all departments, while other users see only their own department's data
+-   **Security Checks**: Department head approval/rejection actions validated to prevent cross-department access
 
 ### Input Validation
 
