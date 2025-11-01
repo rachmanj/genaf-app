@@ -87,11 +87,11 @@
 **Solution**: Created SupplyRequests with department-based workflow, SupplyFulfillment with partial fulfillment support, SupplyTransactions with source tracking, DepartmentStock allocation, Departments CRUD with API sync preparation, comprehensive permissions and routes
 **Key Learning**: Two-level approval workflows (Dept Head → GA Admin) with partial fulfillment enable realistic enterprise supply management, department-based allocation provides accountability
 
-### [MEM-013] Stock Opname Module with Gradual Counting (2025-01-25) ⚠️ PARTIAL
+### [MEM-013] Stock Opname Module with Gradual Counting (2025-01-25) ✅ COMPLETE
 
 **Challenge**: Implement physical inventory count system with gradual counting, save progress, and complete later functionality
-**Solution**: Created StockOpnameSession/Items models with status workflow (pending → counting → counted → verified), implemented saveDraft and finalizeCount methods, added photo evidence upload, variance calculation with reason codes, automatic stock adjustment after approval
-**Key Learning**: Gradual counting with draft save enables realistic stock opname workflows - items can be in 'counting' status (work-in-progress) before finalization, concurrent counting supported, status-based workflow provides clear progress tracking
+**Solution**: Created StockOpnameSession/Items models with status workflow (pending → counting → counted → verified), implemented saveDraft and finalizeCount methods, added photo evidence upload, variance calculation with reason codes, automatic stock adjustment after approval, fixed approval workflow with database enum migrations
+**Key Learning**: Gradual counting with draft save enables realistic stock opname workflows - items can be in 'counting' status (work-in-progress) before finalization, concurrent counting supported, status-based workflow provides clear progress tracking. Database enum constraints must be extended when adding new transaction types (added 'adjustment' to type, 'stock_opname' to source).
 
 ### [MEM-014] User Schema & Login Update (2025-10-30) ✅ COMPLETE
 
@@ -128,3 +128,9 @@
 - Challenge/Decision: Validate department-based filtering with real browser testing, discovered Finance users incorrectly assigned to department 7 (Design & Construction) instead of department 8 (Finance).
 - Solution: Conducted comprehensive browser tests with Finance Employee and Finance Dept Head roles, verified filtering works correctly, discovered and fixed department_id mismatch by updating user assignments to correct department.
 - Key Learning: Browser testing with realistic user data reveals data integrity issues that schema/unit tests miss, always verify seed data matches intended test scenarios, department_id validation critical for proper access control.
+
+### [MEM-020] Stock Opname Approval Workflow Fix (2025-01-31) ✅ COMPLETE
+
+- Challenge/Decision: Stock opname approval workflow failed with 422 error due to database enum constraints not allowing 'adjustment' type and 'stock_opname' source in supply_transactions.
+- Solution: Created migrations to extend enum types: added 'adjustment' to `type` enum (in, out, adjustment) and 'stock_opname' to `source` enum (SAP, manual, stock_opname), added eager loading of items.supply before approval in controller.
+- Key Learning: When adding new transaction types/sources, must create database migrations to extend enum constraints. Eager loading relationships before processing prevents N+1 queries and ensures data availability.

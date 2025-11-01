@@ -321,9 +321,12 @@ class StockOpnameController extends Controller
         DB::beginTransaction();
 
         try {
+            // Load items with supplies before approving
+            $session->load('items.supply');
+            
             // Approve session
             $session->approve(auth()->id());
-
+            
             // Create adjustments for items with variance
             foreach ($session->items as $item) {
                 if ($item->hasVariance()) {

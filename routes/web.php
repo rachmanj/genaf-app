@@ -147,6 +147,10 @@ Route::middleware('auth')->group(function () {
         ]);
     });
 
+    // Office Supplies Dashboard
+    Route::get('supplies/dashboard', [\App\Http\Controllers\Admin\SupplyDashboardController::class, 'index'])
+        ->name('supplies.dashboard');
+
     // Main supplies resource routes (must come after nested routes)
     Route::resource('supplies', \App\Http\Controllers\Admin\SupplyController::class)->names([
         'index' => 'supplies.index',

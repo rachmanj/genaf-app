@@ -1,9 +1,10 @@
-- PMS
-  - Buildings CRUD: Completed (visible in sidebar), Filters, Pagination
-  - Rooms CRUD: Completed with Building filter; Select2 + async building search
-  - Reservations: Dependent selects (building→room), availability validation, date-range picker, UX safeguards
-  - Metrics: Per-building occupancy and 30-day maintenance costs on building detail
-  - Next: Maintenance CRUD; PMS dashboard widgets; reporting
+-   PMS
+    -   Buildings CRUD: Completed (visible in sidebar), Filters, Pagination
+    -   Rooms CRUD: Completed with Building filter; Select2 + async building search
+    -   Reservations: Dependent selects (building→room), availability validation, date-range picker, UX safeguards
+    -   Metrics: Per-building occupancy and 30-day maintenance costs on building detail
+    -   Next: Maintenance CRUD; PMS dashboard widgets; reporting
+
 # GENAF Enterprise Management System - Current Tasks
 
 **Purpose**: Track current work and immediate priorities  
@@ -48,9 +49,8 @@ Include relevant context in brackets to help with future AI-assisted coding:
 
 ## Up Next (This Week)
 
--   `[ ] P1: Complete Stock Opname Testing [gradual counting feature, save draft, finalize count]`
 -   `[ ] P2: Add Mobile-Optimized Counting Interface [admin/stock-opname/count.blade.php]`
--   `[ ] P2: Implement Export Functionality for Stock Opname Reports [ExcelపPDF export]`
+-   `[ ] P2: Implement Export Functionality for Stock Opname Reports [Excel/PDF export]`
 -   `[ ] P2: Add Property Management System [waiting for next priority decision]`
 -   `[ ] P2: Vehicle Administration – migrate to server-side DataTables when datasets grow`
 
@@ -60,6 +60,8 @@ Include relevant context in brackets to help with future AI-assisted coding:
 
 ## Recently Completed
 
+-   `[done] P1: Fix Stock Opname Approval Workflow [database enum migrations, eager loading fix, complete end-to-end testing] (completed: 2025-01-31)`
+-   `[done] P1: Complete Stock Opname Testing [session creation, start, counting, verification, complete] (completed: 2025-01-31)`
 -   `[done] P1: Create comprehensive test scenario for Office Supplies module [8 tests, complete workflow] (completed: 2025-01-26)`
 -   `[done] P1: Department-Based Supply Request Scoping & Security [canViewAllDepartments helper, filtering, security checks] (completed: 2025-01-30)`
 -   `[done] P2: Implement Ticket Reservation Module [CRUD operations, approval workflow, document management, DataTables integration] (completed: 2025-10-30)`
@@ -92,7 +94,7 @@ Include relevant context in brackets to help with future AI-assisted coding:
 -   ✅ AdminLTE professional UI
 -   ✅ Comprehensive testing completed
 
-**Module 2 - Office Supplies Management**: 95% Complete - Major Features Implemented
+**Module 2 - Office Supplies Management**: 100% Complete - Production Ready
 
 **Module 3 - Ticket Reservations**: 100% Complete - Production Ready
 
@@ -113,8 +115,7 @@ Include relevant context in brackets to help with future AI-assisted coding:
 -   ✅ Supply Fulfillment System with distribution tracking
 -   ✅ Department Stock Allocation and Reporting
 -   ✅ Departments Management (CRUD) with API sync preparation
--   ✅ Stock Opname Module (Physical Inventory Count) - 95% complete
--   🔄 DataTables display issue in Stock Opname session items (in progress)
+-   ✅ Stock Opname Module (Physical Inventory Count) - 100% complete
 
 **Key Features Implemented**:
 
@@ -125,6 +126,6 @@ Include relevant context in brackets to help with future AI-assisted coding:
 -   Automatic stock adjustment after approval
 -   Department-based stock allocation
 
-**Technical Debt**: Minor - Stock Opname DataTables initialization issue to resolve
+**Technical Debt**: None
 **Performance**: All modules use efficient server-side DataTables processing
 **Security**: Comprehensive RBAC implemented across all modules

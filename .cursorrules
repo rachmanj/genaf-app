@@ -49,8 +49,7 @@ Periodically (when todo.md gets cluttered):
 ### MySQL MCP Integration
 
 -   **ALWAYS use MySQL MCP** for database queries instead of Laravel Tinker commands
--   MCP provides direct, safe, read-only access to the `dds_backend` database
--   Available tables include: users, departments, additional_documents, distributions, invoices, etc.
+-   MCP provides direct, safe, read-only access to the `genaf_db` database
 -   Query the database directly using natural language requests
 
 ### Database Query Guidelines

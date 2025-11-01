@@ -209,7 +209,7 @@
     </section>
 @endsection
 
-@push('scripts')
+@section('scripts')
     <script>
         $(document).ready(function() {
             var table = $('#tbl-session-items').DataTable({
@@ -440,5 +440,166 @@
             $('#reason-filter').val('');
             $('#tbl-session-items').DataTable().ajax.reload();
         }
+
+        window.countItem = function(itemId) {
+            Swal.fire({
+                title: 'Count Item',
+                html: `
+                    <div class="form-group">
+                        <label>Actual Count:</label>
+                        <input type="number" class="form-control" id="actual-count" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Reason Code:</label>
+                        <select class="form-control" id="reason-code">
+                            <option value="">No Reason</option>
+                            <option value="damaged">Damaged</option>
+                            <option value="expired">Expired</option>
+                            <option value="lost">Lost</option>
+                            <option value="found">Found</option>
+                            <option value="miscount">Miscount</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Reason Notes:</label>
+                        <textarea class="form-control" id="reason-notes" rows="3"></textarea>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Save Count',
+                cancelButtonText: 'Cancel',
+                preConfirm: () => {
+                    const actualCount = document.getElementById('actual-count').value;
+                    if (!actualCount) {
+                        Swal.showValidationMessage('Actual count is required');
+                        return false;
+                    }
+                    return {
+                        actual_count: actualCount,
+                        reason_code: document.getElementById('reason-code').value || null,
+                        reason_notes: document.getElementById('reason-notes').value || null
+                    };
+                },
+                didOpen: () => {
+                    document.getElementById('actual-count').focus();
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ url('supplies/stock-opname') }}/{{ $session->id }}/items/" + itemId,
+                        type: 'PUT',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            ...result.value
+                        },
+                        success: function(response) {
+                            toastr.success(response.message);
+                            $('#tbl-session-items').DataTable().ajax.reload();
+                        },
+                        error: function(xhr) {
+                            toastr.error(xhr.responseJSON.error || 'Failed to update count');
+                        }
+                    });
+                }
+            });
+        };
+
+        window.verifyItem = function(itemId) {
+            Swal.fire({
+                title: 'Verify Count',
+                text: "Are you sure you want to verify this count?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, verify it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ url('supplies/stock-opname') }}/{{ $session->id }}/items/" + itemId + "/verify",
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            toastr.success(response.message);
+                            $('#tbl-session-items').DataTable().ajax.reload();
+                        },
+                        error: function(xhr) {
+                            toastr.error(xhr.responseJSON.error || 'Failed to verify count');
+                        }
+                    });
+                }
+            });
+        };
+
+        window.editReason = function(itemId) {
+            Swal.fire({
+                title: 'Edit Reason',
+                html: `
+                    <div class="form-group">
+                        <label>Reason Code:</label>
+                        <select class="form-control" id="reason-code">
+                            <option value="">No Reason</option>
+                            <option value="damaged">Damaged</option>
+                            <option value="expired">Expired</option>
+                            <option value="lost">Lost</option>
+                            <option value="found">Found</option>
+                            <option value="miscount">Miscount</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Reason Notes:</label>
+                        <textarea class="form-control" id="reason-notes" rows="3"></textarea>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Update Reason',
+                cancelButtonText: 'Cancel',
+                preConfirm: () => {
+                    return {
+                        reason_code: document.getElementById('reason-code').value || null,
+                        reason_notes: document.getElementById('reason-notes').value || null
+                    };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ url('supplies/stock-opname') }}/{{ $session->id }}/items/" + itemId,
+                        type: 'PUT',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            ...result.value
+                        },
+                        success: function(response) {
+                            toastr.success('Reason updated successfully');
+                            $('#tbl-session-items').DataTable().ajax.reload();
+                        },
+                        error: function(xhr) {
+                            toastr.error(xhr.responseJSON.error || 'Failed to update reason');
+                        }
+                    });
+                }
+            });
+        };
+
+        window.viewPhoto = function(itemId) {
+            Swal.fire({
+                title: 'Item Photo',
+                imageUrl: '',
+                imageWidth: 400,
+                imageAlt: 'Item photo'
+            });
+        };
+
+        window.uploadPhoto = function(itemId) {
+            Swal.fire({
+                title: 'Upload Photo',
+                text: 'Photo upload functionality will be implemented',
+                icon: 'info'
+            });
+        };
     </script>
-@endpush
+@endsection

@@ -29,9 +29,9 @@
                 <!-- Office Supplies -->
                 @can('view supplies')
                     <li
-                        class="nav-item {{ request()->routeIs('supplies.*') || request()->routeIs('stock-opname.*') ? 'menu-open' : '' }}">
+                        class="nav-item {{ request()->routeIs('supplies.*') || request()->routeIs('stock-opname.*') || request()->routeIs('supplies.dashboard') ? 'menu-open' : '' }}">
                         <a href="#"
-                            class="nav-link {{ request()->routeIs('supplies.*') || request()->routeIs('stock-opname.*') ? 'active' : '' }}">
+                            class="nav-link {{ request()->routeIs('supplies.*') || request()->routeIs('stock-opname.*') || request()->routeIs('supplies.dashboard') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-box"></i>
                             <p>
                                 Office Supplies
@@ -39,6 +39,13 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('supplies.dashboard') }}"
+                                    class="nav-link {{ request()->routeIs('supplies.dashboard') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Dashboard</p>
+                                </a>
+                            </li>
                             <li class="nav-item">
                                 <a href="{{ route('supplies.index') }}"
                                     class="nav-link {{ request()->routeIs('supplies.index') ? 'active' : '' }}">

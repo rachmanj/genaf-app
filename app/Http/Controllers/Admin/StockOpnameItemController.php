@@ -131,6 +131,8 @@ class StockOpnameItemController extends Controller
         // Update session counters
         $session->update([
             'counted_items' => $session->items()->where('status', '!=', 'pending')->count(),
+            'items_with_variance' => $session->items()->where('variance', '!=', 0)->count(),
+            'total_variance_value' => $session->getTotalVarianceValue(),
         ]);
 
         return response()->json([
@@ -169,6 +171,8 @@ class StockOpnameItemController extends Controller
         // Update session counters
         $session->update([
             'counted_items' => $session->items()->where('status', '!=', 'pending')->count(),
+            'items_with_variance' => $session->items()->where('variance', '!=', 0)->count(),
+            'total_variance_value' => $session->getTotalVarianceValue(),
         ]);
 
         return response()->json([
@@ -223,6 +227,13 @@ class StockOpnameItemController extends Controller
         }
 
         $item->verify(auth()->id());
+
+        // Update session counters
+        $session->update([
+            'counted_items' => $session->items()->where('status', '!=', 'pending')->count(),
+            'items_with_variance' => $session->items()->where('variance', '!=', 0)->count(),
+            'total_variance_value' => $session->getTotalVarianceValue(),
+        ]);
 
         return response()->json([
             'success' => true,
