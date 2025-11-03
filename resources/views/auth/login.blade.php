@@ -5,7 +5,7 @@
 @section('content')
     <div class="login-box">
         <div class="login-logo">
-            <a href="#"><b>GENAF</b> Enterprise</a>
+            <a href="#"><b>GENAF-App</b></a>
         </div>
         <!-- /.login-logo -->
         <div class="card">

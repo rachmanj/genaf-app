@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolePermissionSeeder::class,
             DepartmentSeeder::class,
+            ProjectSeeder::class,
         ]);
 
         // Create users and assign roles BEFORE other seeders that reference users

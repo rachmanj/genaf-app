@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>@yield('title', 'GENAF Enterprise Management') - GENAF</title>
+<title>@yield('title', 'GENAF-App Management') - GENAF-App</title>
 
 <!-- Google Font: Source Sans Pro -->
 <link rel="stylesheet" href="{{ asset('adminlte/fontgoogle.css') }}">

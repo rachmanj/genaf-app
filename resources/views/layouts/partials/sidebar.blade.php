@@ -4,7 +4,7 @@
     <a href="/dashboard" class="brand-link">
         <img src="{{ asset('adminlte/dist/img/AdminLTELogo.png') }}" alt="AdminLTE Logo"
             class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">GENAF - <b>Enterprise</b></span>
+        <span class="brand-text font-weight-light">GENAF-App</span>
     </a>
 
     <!-- Sidebar -->
@@ -248,6 +248,13 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.projects.index') }}"
+                                    class="nav-link {{ request()->routeIs('admin.projects.*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Projects</p>
+                                </a>
+                            </li>
                             @can('view users')
                                 <li class="nav-item">
                                     <a href="{{ route('users.index') }}"

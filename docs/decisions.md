@@ -620,3 +620,114 @@ All decisions are scheduled for review in March 2025 to ensure they continue to 
 - ⚠️ Will require server-side endpoint changes when scaling
 
 **Review Date**: 2025-12-15
+
+---
+
+## ADR-019: Module-Based Controller Organization
+
+**Date**: November 2025  
+**Status**: Accepted  
+**Context**: As the application grew, controllers were accumulating in a single `Admin` folder, making it difficult to navigate, maintain, and scale. Controllers from different business modules (Office Supplies, Vehicle Administration, Property Management, etc.) were mixed together.
+
+**Decision**: Reorganize controllers into module-specific directories based on business domains:
+
+- `Admin/` - User & System Administration (User, Role, Permission, Department)
+- `OfficeSupplies/` - Office Supplies Management (9 controllers)
+- `PropertyManagement/` - Property Management System (3 controllers)
+- `Vehicle/` - Vehicle Administration (4 controllers)
+- `TicketReservation/` - Ticket Reservation (1 controller)
+- `Common/` - Shared controllers (Profile)
+- `Auth/` - Authentication controllers (unchanged, Laravel Breeze)
+
+**Alternatives Considered**:
+
+1. **Flat structure with prefixes**: Keep all controllers flat but use naming conventions like `AdminSupplyController`, `AdminVehicleController`
+2. **Feature-based organization**: Organize by feature rather than module (e.g., `CRUD/`, `Reports/`, `Workflows/`)
+3. **Keep existing Admin folder**: Maintain status quo with everything in `Admin/`
+4. **Module-based organization**: Group by business module (chosen approach)
+
+**Rationale**:
+
+- **Better Scalability**: Each module has its own namespace, making it easy to add new controllers
+- **Improved Maintainability**: Developers can quickly locate controllers for a specific module
+- **Clear Module Boundaries**: Reflects the actual business structure and module organization
+- **Team Collaboration**: Multiple developers can work on different modules without conflicts
+- **Namespace Clarity**: Module-specific namespaces clearly indicate controller purpose
+- **Future-Proof**: Structure supports growth and potential module extraction
+
+**Consequences**:
+
+- ✅ **Positive**: Clear separation of concerns by business module
+- ✅ **Positive**: Easier navigation and file discovery
+- ✅ **Positive**: Better organization for large codebases
+- ✅ **Positive**: Aligns with documented module structure
+- ✅ **Positive**: Supports future module extraction or microservices migration
+- ⚠️ **Negative**: Requires updating all route references
+- ⚠️ **Negative**: Initial reorganization effort (one-time cost)
+- ⚠️ **Negative**: Need to update documentation and training materials
+
+**Implementation Notes**:
+
+- All controller namespaces updated to match new directory structure
+- Route files (`routes/web.php`) updated with new controller paths
+- Views were later reorganized to match controller structure (see ADR-020)
+- All functionality preserved during reorganization
+
+**Review Date**: May 2026
+
+---
+
+## ADR-020: Module-Based Views Organization
+
+**Date**: November 2025  
+**Status**: Accepted  
+**Context**: Following the controller reorganization into module-based directories, views were still organized under a single `admin/` folder. This created inconsistency between controllers and views, making it difficult to locate module-specific views and maintain the codebase as it grows.
+
+**Decision**: Reorganize views into module-specific directories matching the controller structure:
+
+- `admin/` - User & System Administration views (departments, permissions, roles, users)
+- `office-supplies/` - Office Supplies Management views (supplies, supply-requests, supply-transactions, supply-fulfillment, department-stock, stock-opname)
+- `property-management/` - Property Management System views (buildings, rooms, room-reservations)
+- `vehicle/` - Vehicle Administration views (vehicles, fuel-records, maintenance)
+- `ticket-reservation/` - Ticket Reservation views (ticket-reservations)
+- `common/` - Shared views (profile)
+- `auth/`, `components/`, `layouts/` - System-level views (unchanged)
+
+**Alternatives Considered**:
+
+1. **Keep views in admin folder**: Maintain all views under `admin/` with flat structure
+2. **Controller-based organization**: Organize views to match controller file names exactly
+3. **Feature-based organization**: Group by feature type (CRUD, reports, workflows) rather than module
+4. **Module-based organization**: Group by business module matching controllers (chosen approach)
+
+**Rationale**:
+
+- **Consistency**: Views organization matches controller organization, creating intuitive navigation
+- **Alignment**: Developers working on a module find both controllers and views in corresponding locations
+- **Scalability**: Each module has its own view directory, making it easy to add new views
+- **Maintainability**: Clear module boundaries simplify code maintenance and updates
+- **Team Collaboration**: Multiple developers can work on different modules without view path conflicts
+- **Future-Proof**: Structure supports potential module extraction or microservices migration
+
+**Consequences**:
+
+- ✅ **Positive**: Consistent structure between controllers and views
+- ✅ **Positive**: Easier to locate module-specific views
+- ✅ **Positive**: Better organization for large codebases with many views
+- ✅ **Positive**: Aligns with documented module structure
+- ✅ **Positive**: Supports future module extraction or independent deployment
+- ⚠️ **Negative**: Requires updating all controller view references
+- ⚠️ **Negative**: Requires updating view includes/partials references
+- ⚠️ **Negative**: Initial reorganization effort (one-time cost)
+- ⚠️ **Negative**: Need to update documentation and training materials
+
+**Implementation Notes**:
+
+- All controller `view()` calls updated with new module-based paths
+- View includes (e.g., `@include('profile.partials.*')`) updated to new paths
+- View naming convention: kebab-case directories (e.g., `office-supplies`, `property-management`)
+- Controller view references use dot notation (e.g., `office-supplies.supplies.index`)
+- Shared layouts and components remain unchanged in their existing locations
+- Total of 59+ view files reorganized into module directories
+
+**Review Date**: May 2026

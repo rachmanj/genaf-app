@@ -182,11 +182,11 @@ A comprehensive enterprise management system for GENAF company covering office s
 
 ```php
 Route::middleware('auth')->group(function () {
-    Route::resource('vehicles', \App\Http\Controllers\Admin\VehicleController::class);
-    Route::resource('fuel-records', \App\Http\Controllers\Admin\FuelRecordController::class)->only(['index','create','store','edit','update','destroy']);
-    Route::resource('vehicle-maintenance', \App\Http\Controllers\Admin\VehicleMaintenanceController::class)->only(['index','create','store','edit','update','destroy']);
-    Route::resource('vehicle-documents', \App\Http\Controllers\Admin\VehicleDocumentController::class)->only(['store','destroy']);
-    Route::get('vehicle-documents/{document}/download', [\App\Http\Controllers\Admin\VehicleDocumentController::class, 'download'])->name('vehicle-documents.download');
+    Route::resource('vehicles', \App\Http\Controllers\Vehicle\VehicleController::class);
+    Route::resource('fuel-records', \App\Http\Controllers\Vehicle\FuelRecordController::class)->only(['index','create','store','edit','update','destroy']);
+    Route::resource('vehicle-maintenance', \App\Http\Controllers\Vehicle\VehicleMaintenanceController::class)->only(['index','create','store','edit','update','destroy']);
+    Route::resource('vehicle-documents', \App\Http\Controllers\Vehicle\VehicleDocumentController::class)->only(['store','destroy']);
+    Route::get('vehicle-documents/{document}/download', [\App\Http\Controllers\Vehicle\VehicleDocumentController::class, 'download'])->name('vehicle-documents.download');
 });
 ```
 
@@ -199,7 +199,7 @@ Route::middleware('auth')->group(function () {
 
 #### Files
 
--   Views under `resources/views/admin/vehicles/**` with AdminLTE placeholders
+-   Views under `resources/views/vehicle/**` with AdminLTE placeholders
 -   Sidebar links wired to `vehicles.index`, `fuel-records.index`, `vehicle-maintenance.index`
 -   Dashboard small boxes for expiring documents and upcoming services
 
@@ -392,13 +392,88 @@ The system includes 58 comprehensive permissions covering:
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified']);
 
 // User Management
-Route::resource('users', UserController::class)->middleware('auth');
+Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->middleware('auth');
 
 // Admin Routes
 Route::prefix('admin')->middleware('auth')->group(function () {
-    Route::resource('roles', RoleController::class);
-    Route::resource('permissions', PermissionController::class);
+    Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class);
+    Route::resource('permissions', \App\Http\Controllers\Admin\PermissionController::class);
 });
+
+// Office Supplies Routes
+Route::prefix('supplies')->middleware('auth')->group(function () {
+    Route::resource('supplies', \App\Http\Controllers\OfficeSupplies\SupplyController::class);
+    Route::resource('requests', \App\Http\Controllers\OfficeSupplies\SupplyRequestController::class);
+    // ... other supply routes
+});
+
+// Property Management Routes
+Route::prefix('pms')->middleware('auth')->name('pms.')->group(function () {
+    Route::resource('buildings', \App\Http\Controllers\PropertyManagement\BuildingController::class);
+    Route::resource('rooms', \App\Http\Controllers\PropertyManagement\RoomController::class);
+    // ... other PMS routes
+});
+
+// Vehicle Routes
+Route::middleware('auth')->group(function () {
+    Route::resource('vehicles', \App\Http\Controllers\Vehicle\VehicleController::class);
+    // ... other vehicle routes
+});
+
+// Ticket Reservation Routes
+Route::middleware('auth')->group(function () {
+    Route::resource('ticket-reservations', \App\Http\Controllers\TicketReservation\TicketReservationController::class);
+});
+
+// Common Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [\App\Http\Controllers\Common\ProfileController::class, 'edit'])->name('profile.edit');
+    // ... other profile routes
+});
+```
+
+### Controller Organization
+
+Controllers are organized by module for better maintainability and scalability:
+
+```
+app/Http/Controllers/
+├── Admin/                      # User & System Administration
+│   ├── UserController.php
+│   ├── RoleController.php
+│   ├── PermissionController.php
+│   └── DepartmentController.php
+│
+├── OfficeSupplies/            # Office Supplies Management Module
+│   ├── SupplyController.php
+│   ├── SupplyRequestController.php
+│   ├── SupplyTransactionController.php
+│   ├── SupplyFulfillmentController.php
+│   ├── SupplyDashboardController.php
+│   ├── DepartmentStockController.php
+│   ├── StockOpnameController.php
+│   ├── StockOpnameItemController.php
+│   └── StockOpnameReportController.php
+│
+├── PropertyManagement/        # Property Management System (PMS)
+│   ├── BuildingController.php
+│   ├── RoomController.php
+│   └── RoomReservationController.php
+│
+├── Vehicle/                   # Vehicle Administration Module
+│   ├── VehicleController.php
+│   ├── VehicleMaintenanceController.php
+│   ├── VehicleDocumentController.php
+│   └── FuelRecordController.php
+│
+├── TicketReservation/         # Ticket Reservation Module
+│   └── TicketReservationController.php
+│
+├── Common/                    # Shared/Common Controllers
+│   └── ProfileController.php
+│
+└── Auth/                      # Authentication Controllers (Laravel Breeze)
+    └── ...
 ```
 
 ### Controller Pattern
@@ -406,9 +481,65 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 All controllers follow Laravel conventions:
 
 -   **Resource Controllers**: Standard CRUD operations
+-   **Module-based Organization**: Controllers grouped by business module
+-   **Namespace Structure**: Controllers organized in module-specific namespaces
 -   **Permission Checks**: `@can` directives in views, middleware in controllers
 -   **Validation**: Form Request classes for input validation
 -   **Response Handling**: Redirect with success/error messages
+
+### Views Organization
+
+Views are organized by module to align with the controller structure:
+
+```
+resources/views/
+├── admin/                      # User & System Administration
+│   ├── departments/
+│   ├── permissions/
+│   ├── roles/
+│   └── users/
+│
+├── office-supplies/           # Office Supplies Management Module
+│   ├── supplies/
+│   ├── supply-requests/
+│   ├── supply-transactions/
+│   ├── supply-fulfillment/
+│   ├── department-stock/
+│   └── stock-opname/
+│       └── reports/
+│
+├── property-management/       # Property Management System (PMS)
+│   ├── buildings/
+│   ├── rooms/
+│   └── room-reservations/
+│
+├── vehicle/                   # Vehicle Administration Module
+│   ├── vehicles/
+│   │   └── partials/
+│   ├── fuel-records/
+│   └── maintenance/
+│
+├── ticket-reservation/        # Ticket Reservation Module
+│   └── ticket-reservations/
+│
+├── common/                    # Shared/Common Views
+│   └── profile/
+│       └── partials/
+│
+├── auth/                      # Authentication Views (Laravel Breeze)
+├── components/                # Reusable Components
+├── layouts/                   # Layout Templates
+│   └── partials/
+│       └── menu/
+├── dashboard.blade.php        # Main Dashboard
+└── welcome.blade.php          # Welcome Page
+```
+
+**View Naming Convention**:
+- Module-based organization matching controller structure
+- Kebab-case for directory names (e.g., `office-supplies`, `property-management`)
+- Controller references use dot notation (e.g., `office-supplies.supplies.index`)
+- Partials stored in `partials/` subdirectories when needed
 
 ## Data Flow
 
@@ -481,8 +612,23 @@ resources/views/layouts/
     ├── sidebar.blade.php   # Left sidebar navigation
     ├── breadcrumb.blade.php # Breadcrumb navigation
     ├── footer.blade.php    # Footer
-    └── scripts.blade.php   # JavaScript includes
+    ├── scripts.blade.php   # JavaScript includes
+    └── menu/               # Sidebar menu partials
+        ├── admin.blade.php
+        ├── master.blade.php
+        └── ...
 ```
+
+### View Pattern
+
+All views follow consistent patterns:
+
+-   **Layout Inheritance**: All views extend `layouts.main` using `@extends('layouts.main')`
+-   **Module-based Organization**: Views organized by module matching controller structure
+-   **View References**: Controllers reference views using dot notation (e.g., `office-supplies.supplies.index`)
+-   **Permission Checks**: `@can` directives control UI element visibility
+-   **Component Reusability**: Common components in `components/` directory
+-   **Partials**: Module-specific partials stored in `partials/` subdirectories
 
 ### Component Usage
 

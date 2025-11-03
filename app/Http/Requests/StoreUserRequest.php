@@ -30,6 +30,7 @@ class StoreUserRequest extends FormRequest
             'role' => 'required|exists:roles,name',
             'department_id' => 'nullable|exists:departments,id',
             'phone' => 'nullable|string|max:20',
+            'project' => 'nullable|string|max:255',
             'is_active' => 'boolean',
         ];
     }

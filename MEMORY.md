@@ -134,3 +134,15 @@
 - Challenge/Decision: Stock opname approval workflow failed with 422 error due to database enum constraints not allowing 'adjustment' type and 'stock_opname' source in supply_transactions.
 - Solution: Created migrations to extend enum types: added 'adjustment' to `type` enum (in, out, adjustment) and 'stock_opname' to `source` enum (SAP, manual, stock_opname), added eager loading of items.supply before approval in controller.
 - Key Learning: When adding new transaction types/sources, must create database migrations to extend enum constraints. Eager loading relationships before processing prevents N+1 queries and ensures data availability.
+
+### [MEM-021] Controller Module-Based Reorganization (2025-11-01) ✅ COMPLETE
+
+- Challenge/Decision: Controllers accumulated in single Admin folder making navigation/maintenance difficult; needed scalable structure aligned with business modules.
+- Solution: Reorganized 24 controllers into module directories: Admin (4), OfficeSupplies (9), PropertyManagement (3), Vehicle (4), TicketReservation (1), Common (1); updated all namespaces and route references in routes/web.php.
+- Key Learning: Module-based organization improves scalability and maintainability for growing applications; reflects business structure; supports future module extraction. Route references must be updated systematically when reorganizing controllers.
+
+### [MEM-022] Views Module-Based Reorganization (2025-11-02) ✅ COMPLETE
+
+- Challenge/Decision: Views remained in single admin/ folder after controller reorganization, creating inconsistency and making module-specific views difficult to locate.
+- Solution: Reorganized 59+ view files into module directories matching controller structure: admin/, office-supplies/, property-management/, vehicle/, ticket-reservation/, common/; updated all controller view() references and view includes (e.g., profile.partials.* → common.profile.partials.*).
+- Key Learning: Views should align with controller organization for consistency and maintainability; kebab-case directory naming (office-supplies vs office_supplies) follows Laravel conventions; systematic update of both controller references and view includes critical for successful reorganization.

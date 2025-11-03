@@ -5,6 +5,6 @@
         Developed by <strong>IT Dept</strong>
     </div>
     <!-- Default to the left -->
-    <strong>Copyright &copy; {{ date('Y') }} <a href="#">GENAF</a>.</strong> All rights
+    <strong>Copyright &copy; {{ date('Y') }} <a href="#">GENAF-App</a>.</strong> All rights
     reserved.
 </footer>

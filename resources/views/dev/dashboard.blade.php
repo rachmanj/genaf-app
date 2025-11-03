@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GENAF Development Dashboard</title>
+    <title>GENAF-App Development Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-100">
     <div class="container mx-auto px-4 py-8">
         <div class="bg-white rounded-lg shadow-lg p-6">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">GENAF Development Dashboard</h1>
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">GENAF-App Development Dashboard</h1>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Database Status -->
