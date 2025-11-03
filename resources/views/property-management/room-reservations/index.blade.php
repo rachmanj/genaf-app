@@ -31,6 +31,7 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
+                                            <th>Form Number</th>
                                             <th>Building</th>
                                             <th>Room</th>
                                             <th>Guest</th>
@@ -42,6 +43,7 @@
                                         @forelse ($reservations as $i => $res)
                                             <tr>
                                                 <td>{{ $reservations->firstItem() + $i }}</td>
+                                                <td>{{ $res->form_number }}</td>
                                                 <td>{{ $res->room?->building?->name }}</td>
                                                 <td>{{ $res->room?->room_number }}</td>
                                                 <td>{{ $res->guest_name }}</td>

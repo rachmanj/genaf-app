@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\FormNumberService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +12,7 @@ class VehicleMaintenance extends Model
     use HasFactory;
 
     protected $fillable = [
+        'form_number',
         'vehicle_id',
         'maintenance_type',
         'service_date',
@@ -47,6 +49,15 @@ class VehicleMaintenance extends Model
         return $query->where(function ($q) use ($days) {
             $q->whereNotNull('next_service_date')
                 ->where('next_service_date', '<=', now()->addDays($days));
+        });
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if (empty($model->form_number)) {
+                $model->form_number = FormNumberService::generateFormNumber('41', 'vehicle_maintenances');
+            }
         });
     }
 }

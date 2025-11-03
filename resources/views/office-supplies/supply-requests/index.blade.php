@@ -56,7 +56,7 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Request #</th>
+                                        <th>Form Number</th>
                                         <th>Employee</th>
                                         <th>Request Date</th>
                                         <th>Status</th>
@@ -119,8 +119,8 @@
                         searchable: false
                     },
                     {
-                        data: 'id',
-                        name: 'id'
+                        data: 'form_number',
+                        name: 'form_number'
                     },
                     {
                         data: 'employee_name',

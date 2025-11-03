@@ -76,10 +76,13 @@
                                                     <td>{{ $item->approved_quantity ?? 0 }}</td>
                                                     <td>{{ $item->supply->current_stock ?? 0 }}</td>
                                                     <td>
+                                                        @php
+                                                            $remaining = ($item->approved_quantity ?? 0) - ($item->fulfilled_quantity ?? 0);
+                                                        @endphp
                                                         <input type="number"
                                                             name="items[{{ $loop->index }}][fulfill_quantity]"
-                                                            value="{{ $item->approved_quantity ?? 0 }}" min="0"
-                                                            max="{{ $item->approved_quantity ?? 0 }}"
+                                                            value="{{ $remaining }}" min="0"
+                                                            max="{{ $remaining }}"
                                                             class="form-control form-control-sm" required>
                                                         <input type="hidden" name="items[{{ $loop->index }}][item_id]"
                                                             value="{{ $item->id }}">

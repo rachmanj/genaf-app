@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Department;
+use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -71,13 +72,22 @@ class UserController extends Controller
             $query->where('is_active', $request->get('status') === 'active');
         }
 
+        // Filter by project
+        if ($request->filled('project')) {
+            $projectCode = $request->get('project');
+            $query->where('project', 'like', "%{$projectCode}%");
+        }
+
         $users = $query->with('department')->orderBy('name')->paginate(15);
         $users->appends($request->query());
 
         // Get departments for filter dropdown
         $departments = Department::active()->orderBy('department_name')->get();
+        
+        // Get projects for filter dropdown
+        $projects = Project::where('is_active', true)->orderBy('code')->get();
 
-        return view('admin.users.index', compact('users', 'departments'));
+        return view('admin.users.index', compact('users', 'departments', 'projects'));
     }
 
     /**

@@ -17,6 +17,7 @@ class FuelRecordController extends Controller
                 'data' => $query->get()->map(function (FuelRecord $r) {
                     return [
                         'id' => $r->id,
+                        'form_number' => $r->form_number,
                         'date' => optional($r->date)->format('Y-m-d'),
                         'vehicle' => $r->vehicle?->plate_number,
                         'odometer' => number_format($r->odometer),

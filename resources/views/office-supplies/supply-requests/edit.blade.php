@@ -122,7 +122,7 @@
     </section>
 @endsection
 
-@push('scripts')
+@push('js')
     <script>
         $(document).ready(function() {
             let itemIndex = {{ $supplyRequest->items->count() }};
@@ -185,10 +185,6 @@
                 const stock = selectedOption.data('stock');
 
                 $(this).closest('.item-row').find('.unit-display').val(unit);
-
-                // Set max quantity to current stock
-                const quantityInput = $(this).closest('.item-row').find('.quantity-input');
-                quantityInput.attr('max', stock);
             });
 
             // Update remove buttons visibility
@@ -204,11 +200,12 @@
             // Initialize remove buttons visibility
             updateRemoveButtons();
 
-            // Form validation
+            // Form validation and SweetAlert confirmation
             $('form').on('submit', function(e) {
+                e.preventDefault();
+                
                 const itemRows = $('.item-row');
                 if (itemRows.length === 0) {
-                    e.preventDefault();
                     toastr.error('Please add at least one item to the request.');
                     return false;
                 }
@@ -225,10 +222,26 @@
                 });
 
                 if (!isValid) {
-                    e.preventDefault();
                     toastr.error('Please fill in all required fields for all items.');
                     return false;
                 }
+
+                // Show SweetAlert confirmation
+                Swal.fire({
+                    title: 'Confirm Update',
+                    text: 'Are you sure you want to update this supply request?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#007bff',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, update request!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Submit the form
+                        $('form')[0].submit();
+                    }
+                });
             });
 
             // Show session messages

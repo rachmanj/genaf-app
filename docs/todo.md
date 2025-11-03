@@ -60,6 +60,10 @@ Include relevant context in brackets to help with future AI-assisted coding:
 
 ## Recently Completed
 
+-   `[done] P1: Improve Supply Request Pages [SweetAlert confirmation, remove stock validation] (completed: 2025-11-03)`
+-   `[done] P1: Implement Modal with DataTable for Supply Selection [replaced select dropdown with searchable modal, 172+ items] (completed: 2025-11-03)`
+-   `[done] P1: Fix Partial Fulfillment Workflow [show partially_fulfilled requests, calculate remaining quantity correctly] (completed: 2025-11-03)`
+-   `[done] P1: Test Supply Fulfillment Functionality [partial fulfillment, stock reduction, distribution & transaction tracking] (completed: 2025-11-03)`
 -   `[done] P1: Fix Stock Opname Approval Workflow [database enum migrations, eager loading fix, complete end-to-end testing] (completed: 2025-01-31)`
 -   `[done] P1: Complete Stock Opname Testing [session creation, start, counting, verification, complete] (completed: 2025-01-31)`
 -   `[done] P1: Create comprehensive test scenario for Office Supplies module [8 tests, complete workflow] (completed: 2025-01-26)`

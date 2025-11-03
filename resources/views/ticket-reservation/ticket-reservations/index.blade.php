@@ -73,6 +73,7 @@
                             <table id="tbl-ticket-reservations" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
+                                        <th>Form Number</th>
                                         <th>Employee</th>
                                         <th>Type</th>
                                         <th>Destination</th>
@@ -164,7 +165,9 @@
                         d.date_to = $('#filter-date-to').val();
                     }
                 },
-                columns: [{
+                columns: [
+                    { data: 'form_number', name: 'form_number' },
+                    {
                         data: 'employee_name',
                         name: 'employee_name'
                     },

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\FormNumberService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +13,7 @@ class SupplyRequest extends Model
     use HasFactory;
 
     protected $fillable = [
+        'form_number',
         'employee_id',
         'department_id',
         'request_date',
@@ -94,7 +96,7 @@ class SupplyRequest extends Model
      */
     public function canBeFulfilled(): bool
     {
-        return $this->status === 'approved';
+        return in_array($this->status, ['approved', 'partially_fulfilled']);
     }
 
     /**
@@ -127,5 +129,14 @@ class SupplyRequest extends Model
     public function canBeGAAdminRejected(): bool
     {
         return $this->status === 'pending_ga_admin';
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if (empty($model->form_number)) {
+                $model->form_number = FormNumberService::generateFormNumber('11', 'supply_requests');
+            }
+        });
     }
 }

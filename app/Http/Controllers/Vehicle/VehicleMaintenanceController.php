@@ -16,6 +16,7 @@ class VehicleMaintenanceController extends Controller
                 'data' => $query->get()->map(function (VehicleMaintenance $m) {
                     return [
                         'id' => $m->id,
+                        'form_number' => $m->form_number,
                         'service_date' => optional($m->service_date)->format('Y-m-d'),
                         'vehicle' => $m->vehicle?->plate_number,
                         'maintenance_type' => $m->maintenance_type,

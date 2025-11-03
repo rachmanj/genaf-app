@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\FormNumberService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +12,7 @@ class VehicleDocument extends Model
     use HasFactory;
 
     protected $fillable = [
+        'form_number',
         'vehicle_id',
         'document_type',
         'issue_date',
@@ -38,6 +40,15 @@ class VehicleDocument extends Model
     {
         return $query->where('expiry_date', '<=', now()->addDays($days))
             ->where('expiry_date', '>', now());
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if (empty($model->form_number)) {
+                $model->form_number = FormNumberService::generateFormNumber('43', 'vehicle_documents');
+            }
+        });
     }
 }
 

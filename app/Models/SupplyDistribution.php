@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\FormNumberService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +12,7 @@ class SupplyDistribution extends Model
     use HasFactory;
 
     protected $fillable = [
+        'form_number',
         'supply_id',
         'department_id',
         'request_item_id',
@@ -71,5 +73,14 @@ class SupplyDistribution extends Model
             ->groupBy('department_id', 'departments.department_name')
             ->orderBy('total_distributed', 'desc')
             ->get();
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if (empty($model->form_number)) {
+                $model->form_number = FormNumberService::generateFormNumber('12', 'supply_distributions');
+            }
+        });
     }
 }

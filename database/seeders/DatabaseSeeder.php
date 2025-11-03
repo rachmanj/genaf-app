@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@genaf.com',
             'username' => 'admin',
             'password' => bcrypt('password'),
-            'department_id' => null,
+            'department_id' => 1, // General Department
             'phone' => '+62-123-456-7890',
             'is_active' => true,
         ]);
@@ -37,7 +37,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'manager@genaf.com',
             'username' => 'manager',
             'password' => bcrypt('password'),
-            'department_id' => null,
+            'department_id' => 1, // General Department
             'phone' => '+62-123-456-7891',
             'is_active' => true,
         ]);
@@ -48,7 +48,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'employee@genaf.com',
             'username' => 'employee',
             'password' => bcrypt('password'),
-            'department_id' => null,
+            'department_id' => 1, // General Department
             'phone' => '+62-123-456-7892',
             'is_active' => true,
         ]);
@@ -60,31 +60,31 @@ class DatabaseSeeder extends Seeder
             'email' => 'gaadmin@genaf.com',
             'username' => 'gaadmin',
             'password' => bcrypt('password'),
-            'department_id' => null, // GA Admin has no specific department - can see all
+            'department_id' => 1, // General Department
             'phone' => '+62-123-456-7893',
             'is_active' => true,
         ]);
         $gaAdminUser->assignRole('ga admin');
 
-        // Department Head for Finance department (department_id = 7 based on DepartmentSeeder)
+        // Department Head for Finance department (department_id = 8)
         $deptHeadFinance = User::create([
             'name' => 'Finance Dept Head',
             'email' => 'finance.depthead@genaf.com',
             'username' => 'finance_depthead',
             'password' => bcrypt('password'),
-            'department_id' => 7,
+            'department_id' => 8, // Finance
             'phone' => '+62-123-456-7894',
             'is_active' => true,
         ]);
         $deptHeadFinance->assignRole('department head');
 
-        // Department Head for IT department (department_id = 16)
+        // Department Head for IT department (department_id = 17)
         $deptHeadIT = User::create([
             'name' => 'IT Dept Head',
             'email' => 'it.depthead@genaf.com',
             'username' => 'it_depthead',
             'password' => bcrypt('password'),
-            'department_id' => 16,
+            'department_id' => 17, // Information Technology
             'phone' => '+62-123-456-7895',
             'is_active' => true,
         ]);
@@ -96,7 +96,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'finance.employee@genaf.com',
             'username' => 'finance_employee',
             'password' => bcrypt('password'),
-            'department_id' => 7,
+            'department_id' => 8, // Finance
             'phone' => '+62-123-456-7896',
             'is_active' => true,
         ]);
@@ -108,7 +108,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'it.employee@genaf.com',
             'username' => 'it_employee',
             'password' => bcrypt('password'),
-            'department_id' => 16,
+            'department_id' => 17, // Information Technology
             'phone' => '+62-123-456-7897',
             'is_active' => true,
         ]);

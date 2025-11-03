@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\FormNumberService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +13,7 @@ class TicketReservation extends Model
     use HasFactory;
 
     protected $fillable = [
+        'form_number',
         'employee_id',
         'ticket_type',
         'destination',
@@ -82,5 +84,14 @@ class TicketReservation extends Model
     public function isRoundTrip(): bool
     {
         return !is_null($this->return_date);
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if (empty($model->form_number)) {
+                $model->form_number = FormNumberService::generateFormNumber('21', 'ticket_reservations');
+            }
+        });
     }
 }

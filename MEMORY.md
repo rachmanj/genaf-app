@@ -146,3 +146,27 @@
 - Challenge/Decision: Views remained in single admin/ folder after controller reorganization, creating inconsistency and making module-specific views difficult to locate.
 - Solution: Reorganized 59+ view files into module directories matching controller structure: admin/, office-supplies/, property-management/, vehicle/, ticket-reservation/, common/; updated all controller view() references and view includes (e.g., profile.partials.* → common.profile.partials.*).
 - Key Learning: Views should align with controller organization for consistency and maintainability; kebab-case directory naming (office-supplies vs office_supplies) follows Laravel conventions; systematic update of both controller references and view includes critical for successful reorganization.
+
+### [MEM-023] Supply Fulfillment Testing & Department Assignment Fix (2025-11-03) ✅ COMPLETE
+
+- Challenge/Decision: Fulfillment testing revealed users without department assignments blocking distribution creation. supply_distributions.department_id is NOT NULL but users/requests lacked departments.
+- Solution: Updated DatabaseSeeder to assign default departments to all users (General Department id=1), corrected department IDs for Finance (8) and IT (17), ran migrate:fresh to apply clean state. Tested end-to-end: created request, approved via dept head & GA admin, partial fulfillment (5 of 10 units), verified stock reduction, distribution record, transaction record, request status update.
+- Key Learning: Department assignment is critical for fulfillment workflows. All users must have departments to enable proper data integrity in distribution tracking. Partial fulfillment correctly updates fulfilled_quantity and request status to 'partially_fulfilled', remaining 5 units can be fulfilled later.
+
+### [MEM-024] Partial Fulfillment Workflow Fix (2025-11-03) ✅ COMPLETE
+
+- Challenge/Decision: Partially fulfilled requests not appearing in fulfillment queue and fulfill quantity showing wrong value (approved instead of remaining).
+- Solution: Updated SupplyFulfillmentController@index to include 'partially_fulfilled' status in WHERE IN clause; updated SupplyRequest@canBeFulfilled() to check for both 'approved' and 'partially_fulfilled'; updated fulfillment show view to calculate remaining = approved_quantity - fulfilled_quantity and display remaining quantity in Fulfill Qty field.
+- Key Learning: Partially fulfilled requests need to remain visible in fulfillment queue until completion. Fulfill quantity field must show remaining quantity (approved - fulfilled), not approved quantity, to prevent over-fulfillment.
+
+### [MEM-025] Modal DataTable Supply Selection (2025-11-03) ✅ COMPLETE
+
+- Challenge/Decision: Regular select dropdown inefficient for 172+ inventory items; needed searchable, sortable interface for better UX when selecting supplies in request form.
+- Solution: Replaced select dropdown with Bootstrap modal containing DataTable. Added suppliesData() controller method with server-side processing, created modal with 25 items/page, search, sort capabilities. Fixed route order issue (supplies-data must come before supplies resource to avoid 404). Changed @push('scripts') to @push('js') for proper script loading.
+- Key Learning: Modal with DataTable provides efficient searchable interface for large item lists. Route ordering critical - specific routes (requests/supplies-data) must come before parameterized resource routes (supplies/{supply}) to prevent conflicts. Use @push('js') not @push('scripts') with Laravel stacks.
+
+### [MEM-026] Supply Request UX Improvements (2025-11-03) ✅ COMPLETE
+
+- Challenge/Decision: Supply request forms needed confirmation dialog to prevent accidental submissions, and stock validation was too restrictive for planning purposes.
+- Solution: Added SweetAlert confirmation dialogs before submit (both create and edit forms). Removed `quantity-input.attr('max', stock)` validation - users can now request any quantity. Stock validation moved to fulfillment process where it belongs. Fixed edit.blade.php script loading directive.
+- Key Learning: Stock validation should occur at fulfillment/transaction time, not at request creation. Requests are planning documents; stock may change between request and fulfillment. SweetAlert confirms prevent accidental submissions and improve data quality.

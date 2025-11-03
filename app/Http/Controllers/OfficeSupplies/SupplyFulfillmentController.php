@@ -18,7 +18,7 @@ class SupplyFulfillmentController extends Controller
     {
         if ($request->ajax()) {
             $requests = SupplyRequest::with(['department', 'employee', 'items.supply'])
-                ->where('status', 'approved')
+                ->whereIn('status', ['approved', 'partially_fulfilled'])
                 ->select('supply_requests.*');
 
             return DataTables::of($requests)
@@ -32,6 +32,9 @@ class SupplyFulfillmentController extends Controller
                     return $request->items->count();
                 })
                 ->addColumn('status_badge', function ($request) {
+                    if ($request->status === 'partially_fulfilled') {
+                        return '<span class="badge badge-warning">Partially Fulfilled</span>';
+                    }
                     return '<span class="badge badge-success">Approved</span>';
                 })
                 ->addColumn('department_name', function ($request) {

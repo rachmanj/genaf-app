@@ -88,6 +88,10 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     // Supply Requests Routes (nested under supplies) - must come before supplies/{supply}
     Route::prefix('supplies')->group(function () {
+        // Supplies data for modal selection (must be first to avoid route conflict)
+        Route::get('requests/supplies-data', [\App\Http\Controllers\OfficeSupplies\SupplyRequestController::class, 'suppliesData'])
+            ->name('supplies.requests.supplies-data');
+        
         Route::resource('requests', \App\Http\Controllers\OfficeSupplies\SupplyRequestController::class)->names([
             'index' => 'supplies.requests.index',
             'create' => 'supplies.requests.create',

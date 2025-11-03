@@ -28,6 +28,9 @@ class SupplyRequestController extends Controller
                 ->addColumn('index', function ($request) {
                     return '';
                 })
+                ->addColumn('form_number', function ($request) {
+                    return $request->form_number ?? 'N/A';
+                })
                 ->addColumn('employee_name', function ($request) {
                     return $request->employee ? $request->employee->name : 'N/A';
                 })
@@ -107,8 +110,21 @@ class SupplyRequestController extends Controller
 
     public function create()
     {
-        $supplies = Supply::orderBy('name')->get();
-        return view('office-supplies.supply-requests.create', compact('supplies'));
+        return view('office-supplies.supply-requests.create');
+    }
+
+    public function suppliesData(Request $request)
+    {
+        if ($request->ajax()) {
+            $supplies = Supply::select('supplies.*');
+
+            return DataTables::of($supplies)
+                ->editColumn('category', function ($supply) {
+                    return $supply->category ?? 'N/A';
+                })
+                ->rawColumns(['category'])
+                ->make(true);
+        }
     }
 
     public function store(Request $request)
@@ -143,10 +159,29 @@ class SupplyRequestController extends Controller
             }
 
             DB::commit();
+            
+            // Handle AJAX requests
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Supply request created successfully.',
+                    'redirect' => route('supplies.requests.index')
+                ]);
+            }
+            
             return redirect()->route('supplies.requests.index')
                 ->with('success', 'Supply request created successfully.');
         } catch (\Exception $e) {
             DB::rollback();
+            
+            // Handle AJAX requests
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to create supply request: ' . $e->getMessage()
+                ], 422);
+            }
+            
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Failed to create supply request: ' . $e->getMessage());

@@ -52,6 +52,9 @@ class TicketReservationController extends Controller
                 }
 
             return DataTables::of($query)
+                ->addColumn('form_number', function ($reservation) {
+                    return $reservation->form_number ?? 'N/A';
+                })
                 ->addColumn('employee_name', function ($reservation) {
                     return $reservation->employee ? $reservation->employee->name : 'N/A';
                 })

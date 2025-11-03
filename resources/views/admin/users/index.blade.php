@@ -37,7 +37,7 @@
                                     <div class="form-group">
                                         <label>Search</label>
                                         <input type="text" name="search" class="form-control"
-                                            placeholder="Name, email, or department..." value="{{ request('search') }}">
+                                            placeholder="Name, email, username..." value="{{ request('search') }}">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
@@ -70,6 +70,20 @@
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
+                                        <label>Project</label>
+                                        <select name="project" class="form-control">
+                                            <option value="">All Projects</option>
+                                            @foreach ($projects as $project)
+                                                <option value="{{ $project->code }}"
+                                                    {{ request('project') == $project->code ? 'selected' : '' }}>
+                                                    {{ $project->code }} - {{ $project->owner }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
                                         <label>Status</label>
                                         <select name="status" class="form-control">
                                             <option value="">All Status</option>
@@ -80,14 +94,14 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-1">
                                     <div class="form-group">
                                         <label>&nbsp;</label>
                                         <div>
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="fas fa-search"></i> Apply Filters
+                                            <button type="submit" class="btn btn-primary btn-sm btn-block mb-1">
+                                                <i class="fas fa-search"></i> Filter
                                             </button>
-                                            <a href="{{ route('users.index') }}" class="btn btn-secondary">
+                                            <a href="{{ route('users.index') }}" class="btn btn-secondary btn-sm btn-block">
                                                 <i class="fas fa-times"></i> Clear
                                             </a>
                                         </div>
@@ -102,6 +116,7 @@
                                 <thead>
                                     <tr>
                                         <th>User</th>
+                                        <th>Username</th>
                                         <th>Role</th>
                                         <th>Department</th>
                                         <th>Project</th>
@@ -123,6 +138,9 @@
                                                         <small class="text-muted">{{ $user->email }}</small>
                                                     </div>
                                                 </div>
+                                            </td>
+                                            <td>
+                                                <span class="text-muted">{{ $user->username ?? 'N/A' }}</span>
                                             </td>
                                             <td>
                                                 @foreach ($user->roles as $role)
@@ -183,7 +201,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center">No users found.</td>
+                                            <td colspan="7" class="text-center">No users found.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
