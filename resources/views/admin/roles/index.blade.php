@@ -119,20 +119,27 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, row) {
+                            var showUrl = '{{ route('admin.roles.show', 0) }}'.replace('/0', '/' +
+                                row.id);
+                            var editUrl = '{{ route('admin.roles.edit', 0) }}'.replace('/0', '/' +
+                                row.id);
+                            var deleteUrl = '{{ route('admin.roles.destroy', 0) }}'.replace('/0',
+                                '/' + row.id);
+
                             var html = '';
-                            html += '<a href="/admin/roles/' + row.id +
+                            html += '<a href="' + showUrl +
                                 '" class="btn btn-sm btn-info mr-1" title="View">';
                             html += '<i class="fas fa-eye"></i></a>';
 
-                            html += '<a href="/admin/roles/' + row.id +
-                                '/edit" class="btn btn-sm btn-warning mr-1" title="Edit">';
+                            html += '<a href="' + editUrl +
+                                '" class="btn btn-sm btn-warning mr-1" title="Edit">';
                             html += '<i class="fas fa-edit"></i></a>';
 
                             // Don't show delete for superadmin
                             if (row.name !== 'superadmin') {
                                 html +=
                                     '<button class="btn btn-sm btn-danger delete-role" data-id="' +
-                                    row.id + '" title="Delete">';
+                                    row.id + '" data-url="' + deleteUrl + '" title="Delete">';
                                 html += '<i class="fas fa-trash"></i></button>';
                             }
 
@@ -147,7 +154,7 @@
 
             // Delete role functionality
             $('#tbl-roles').on('click', '.delete-role', function() {
-                var id = $(this).data('id');
+                var url = $(this).data('url');
                 Swal.fire({
                     title: 'Delete Role?',
                     text: "You won't be able to revert this!",
@@ -158,7 +165,7 @@
                     confirmButtonText: 'Yes, delete it!'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        var form = $('<form method="POST" action="/admin/roles/' + id + '">' +
+                        var form = $('<form method="POST" action="' + url + '">' +
                             '@csrf' +
                             '<input type="hidden" name="_method" value="DELETE">' +
                             '</form>');
