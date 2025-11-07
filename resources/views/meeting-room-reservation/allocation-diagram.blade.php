@@ -47,21 +47,31 @@
                                                 <td><strong>{{ $timeSlot }}</strong></td>
                                                 @foreach($meetingRooms as $room)
                                                     @php
-                                                        $timeSlotDate = \Carbon\Carbon::parse($date . ' ' . $timeSlot);
-                                                        $roomReservations = $reservations->filter(function($res) use ($room, $date, $timeSlotDate) {
-                                                            if ($res->allocated_room_id != $room->id) return false;
-                                                            if ($res->status == 'cancelled' || $res->status == 'rejected') return false;
-                                                            
-                                                            $resStart = \Carbon\Carbon::parse($res->meeting_date_start . ' ' . $res->meeting_time_start);
-                                                            $resEnd = \Carbon\Carbon::parse($res->meeting_date_start . ' ' . $res->meeting_time_end);
-                                                            if ($res->meeting_date_end) {
-                                                                $resEnd = \Carbon\Carbon::parse($res->meeting_date_end . ' ' . $res->meeting_time_end);
+                                                        $timeSlotDate = \Carbon\Carbon::parse($date)->setTimeFromTimeString($timeSlot);
+                                                        $roomReservations = $reservations->filter(function($res) use ($room, $timeSlotDate) {
+                                                            if ($res->allocated_room_id != $room->id) {
+                                                                return false;
                                                             }
-                                                            
-                                                            // Check if current time slot overlaps with reservation
+                                                            if (in_array($res->status, ['cancelled', 'rejected'], true)) {
+                                                                return false;
+                                                            }
+
+                                                            $startTimeString = $res->meeting_time_start instanceof \Carbon\Carbon
+                                                                ? $res->meeting_time_start->format('H:i:s')
+                                                                : (string) $res->meeting_time_start;
+                                                            $endTimeString = $res->meeting_time_end instanceof \Carbon\Carbon
+                                                                ? $res->meeting_time_end->format('H:i:s')
+                                                                : (string) $res->meeting_time_end;
+
+                                                            $resStart = \Carbon\Carbon::parse($res->meeting_date_start)
+                                                                ->setTimeFromTimeString($startTimeString);
+                                                            $resEnd = $res->meeting_date_end
+                                                                ? \Carbon\Carbon::parse($res->meeting_date_end)->setTimeFromTimeString($endTimeString)
+                                                                : \Carbon\Carbon::parse($res->meeting_date_start)->setTimeFromTimeString($endTimeString);
+
                                                             $slotStart = $timeSlotDate->copy();
                                                             $slotEnd = $timeSlotDate->copy()->addHour();
-                                                            
+
                                                             return $slotStart < $resEnd && $slotEnd > $resStart;
                                                         });
                                                     @endphp
@@ -79,7 +89,15 @@
                                                                 @endphp
                                                                 <div class="badge badge-{{ $badgeClass }} mb-1" style="font-size: 0.75rem; display: block;">
                                                                     {{ $res->meeting_title }}<br>
-                                                                    <small>{{ \Carbon\Carbon::parse($res->meeting_time_start)->format('H:i') }} - {{ \Carbon\Carbon::parse($res->meeting_time_end)->format('H:i') }}</small><br>
+                                                                    @php
+                                                                        $badgeStartTime = $res->meeting_time_start instanceof \Carbon\Carbon
+                                                                            ? $res->meeting_time_start
+                                                                            : \Carbon\Carbon::parse($res->meeting_time_start);
+                                                                        $badgeEndTime = $res->meeting_time_end instanceof \Carbon\Carbon
+                                                                            ? $res->meeting_time_end
+                                                                            : \Carbon\Carbon::parse($res->meeting_time_end);
+                                                                    @endphp
+                                                                    <small>{{ $badgeStartTime->format('H:i') }} - {{ $badgeEndTime->format('H:i') }}</small><br>
                                                                     <small>{{ $res->requestor->name ?? 'N/A' }}</small>
                                                                 </div>
                                                             @endforeach
@@ -126,8 +144,15 @@
                                                             <td>{{ $res->allocatedRoom->name ?? 'N/A' }}</td>
                                                             <td>{{ $res->meeting_title }}</td>
                                                             <td>
-                                                                {{ \Carbon\Carbon::parse($res->meeting_time_start)->format('H:i') }} - 
-                                                                {{ \Carbon\Carbon::parse($res->meeting_time_end)->format('H:i') }}
+                                                                @php
+                                                                    $tableStartTime = $res->meeting_time_start instanceof \Carbon\Carbon
+                                                                        ? $res->meeting_time_start
+                                                                        : \Carbon\Carbon::parse($res->meeting_time_start);
+                                                                    $tableEndTime = $res->meeting_time_end instanceof \Carbon\Carbon
+                                                                        ? $res->meeting_time_end
+                                                                        : \Carbon\Carbon::parse($res->meeting_time_end);
+                                                                @endphp
+                                                                {{ $tableStartTime->format('H:i') }} - {{ $tableEndTime->format('H:i') }}
                                                             </td>
                                                             <td>{{ $res->requestor->name ?? 'N/A' }}</td>
                                                             <td>
@@ -176,3 +201,6 @@
         });
     </script>
 @endpush
+
+
+
