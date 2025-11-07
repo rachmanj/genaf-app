@@ -107,66 +107,72 @@
 
 ### [MEM-016] Vehicle Administration Base Implementation (2025-10-30) ✅ COMPLETE
 
-- Challenge/Decision: Introduce Vehicle module with fuel, documents, maintenance, and alerts; choose global list routes for fuel/maintenance and secure document storage.
-- Solution: Added routes, controllers, models with helpers, AdminLTE views, sidebar wiring, dashboard widgets (expiring docs, upcoming services), and secure upload/download using public disk; seeded new permissions.
-- Key Learning: Splitting sub-resources into dedicated controllers with global lists simplifies UX and navigation; enforce permissions including download; helper scopes (`expiringWithin`, `upcoming`) aid dashboard and alerts.
+-   Challenge/Decision: Introduce Vehicle module with fuel, documents, maintenance, and alerts; choose global list routes for fuel/maintenance and secure document storage.
+-   Solution: Added routes, controllers, models with helpers, AdminLTE views, sidebar wiring, dashboard widgets (expiring docs, upcoming services), and secure upload/download using public disk; seeded new permissions.
+-   Key Learning: Splitting sub-resources into dedicated controllers with global lists simplifies UX and navigation; enforce permissions including download; helper scopes (`expiringWithin`, `upcoming`) aid dashboard and alerts.
 
 ### [MEM-017] Vehicle Pages UI Alignment & DevTools Verification (2025-10-30) ✅ COMPLETE
 
-- Challenge/Decision: Vehicle pages lacked consistent layout and table pattern vs supplies; needed quick alignment and validation using Chrome DevTools.
-- Solution: Updated `vehicles`, `fuel-records`, `maintenance` index views to use `layouts.main`, breadcrumbs, AdminLTE card-outline; added client-side DataTables with index column and responsive options; Vehicles filters (Type/Status). Verified via DevTools Elements/Network.
-- Key Learning: Standardizing layout and table options across modules speeds UX consistency; client-side DataTables is acceptable interim before server-side scaling; use `@push('js')` for script stack consistency.
+-   Challenge/Decision: Vehicle pages lacked consistent layout and table pattern vs supplies; needed quick alignment and validation using Chrome DevTools.
+-   Solution: Updated `vehicles`, `fuel-records`, `maintenance` index views to use `layouts.main`, breadcrumbs, AdminLTE card-outline; added client-side DataTables with index column and responsive options; Vehicles filters (Type/Status). Verified via DevTools Elements/Network.
+-   Key Learning: Standardizing layout and table options across modules speeds UX consistency; client-side DataTables is acceptable interim before server-side scaling; use `@push('js')` for script stack consistency.
 
 ### [MEM-018] Department-Based Supply Request Scoping & Security (2025-01-30) ✅ COMPLETE
 
-- Challenge/Decision: Implement department-based visibility and approval security for supply requests - users should only see/approve requests from their department unless they're admin/ga admin.
-- Solution: Added `canViewAllDepartments()` helper to User model checking for admin/ga admin roles, implemented department filtering in SupplyRequestController index method, added security checks in approveDeptHead and rejectDeptHead methods preventing cross-department approvals.
-- Key Learning: Explicit role checks using `canViewAllDepartments()` pattern centralizes authorization logic, department filtering at query level ensures data never reaches unauthorized users, security checks in action methods provide defense-in-depth against potential exploits.
+-   Challenge/Decision: Implement department-based visibility and approval security for supply requests - users should only see/approve requests from their department unless they're admin/ga admin.
+-   Solution: Added `canViewAllDepartments()` helper to User model checking for admin/ga admin roles, implemented department filtering in SupplyRequestController index method, added security checks in approveDeptHead and rejectDeptHead methods preventing cross-department approvals.
+-   Key Learning: Explicit role checks using `canViewAllDepartments()` pattern centralizes authorization logic, department filtering at query level ensures data never reaches unauthorized users, security checks in action methods provide defense-in-depth against potential exploits.
 
 ### [MEM-019] Department Filtering Browser Testing & Data Integrity Fix (2025-01-31) ✅ COMPLETE
 
-- Challenge/Decision: Validate department-based filtering with real browser testing, discovered Finance users incorrectly assigned to department 7 (Design & Construction) instead of department 8 (Finance).
-- Solution: Conducted comprehensive browser tests with Finance Employee and Finance Dept Head roles, verified filtering works correctly, discovered and fixed department_id mismatch by updating user assignments to correct department.
-- Key Learning: Browser testing with realistic user data reveals data integrity issues that schema/unit tests miss, always verify seed data matches intended test scenarios, department_id validation critical for proper access control.
+-   Challenge/Decision: Validate department-based filtering with real browser testing, discovered Finance users incorrectly assigned to department 7 (Design & Construction) instead of department 8 (Finance).
+-   Solution: Conducted comprehensive browser tests with Finance Employee and Finance Dept Head roles, verified filtering works correctly, discovered and fixed department_id mismatch by updating user assignments to correct department.
+-   Key Learning: Browser testing with realistic user data reveals data integrity issues that schema/unit tests miss, always verify seed data matches intended test scenarios, department_id validation critical for proper access control.
 
 ### [MEM-020] Stock Opname Approval Workflow Fix (2025-01-31) ✅ COMPLETE
 
-- Challenge/Decision: Stock opname approval workflow failed with 422 error due to database enum constraints not allowing 'adjustment' type and 'stock_opname' source in supply_transactions.
-- Solution: Created migrations to extend enum types: added 'adjustment' to `type` enum (in, out, adjustment) and 'stock_opname' to `source` enum (SAP, manual, stock_opname), added eager loading of items.supply before approval in controller.
-- Key Learning: When adding new transaction types/sources, must create database migrations to extend enum constraints. Eager loading relationships before processing prevents N+1 queries and ensures data availability.
+-   Challenge/Decision: Stock opname approval workflow failed with 422 error due to database enum constraints not allowing 'adjustment' type and 'stock_opname' source in supply_transactions.
+-   Solution: Created migrations to extend enum types: added 'adjustment' to `type` enum (in, out, adjustment) and 'stock_opname' to `source` enum (SAP, manual, stock_opname), added eager loading of items.supply before approval in controller.
+-   Key Learning: When adding new transaction types/sources, must create database migrations to extend enum constraints. Eager loading relationships before processing prevents N+1 queries and ensures data availability.
 
 ### [MEM-021] Controller Module-Based Reorganization (2025-11-01) ✅ COMPLETE
 
-- Challenge/Decision: Controllers accumulated in single Admin folder making navigation/maintenance difficult; needed scalable structure aligned with business modules.
-- Solution: Reorganized 24 controllers into module directories: Admin (4), OfficeSupplies (9), PropertyManagement (3), Vehicle (4), TicketReservation (1), Common (1); updated all namespaces and route references in routes/web.php.
-- Key Learning: Module-based organization improves scalability and maintainability for growing applications; reflects business structure; supports future module extraction. Route references must be updated systematically when reorganizing controllers.
+-   Challenge/Decision: Controllers accumulated in single Admin folder making navigation/maintenance difficult; needed scalable structure aligned with business modules.
+-   Solution: Reorganized 24 controllers into module directories: Admin (4), OfficeSupplies (9), PropertyManagement (3), Vehicle (4), TicketReservation (1), Common (1); updated all namespaces and route references in routes/web.php.
+-   Key Learning: Module-based organization improves scalability and maintainability for growing applications; reflects business structure; supports future module extraction. Route references must be updated systematically when reorganizing controllers.
 
 ### [MEM-022] Views Module-Based Reorganization (2025-11-02) ✅ COMPLETE
 
-- Challenge/Decision: Views remained in single admin/ folder after controller reorganization, creating inconsistency and making module-specific views difficult to locate.
-- Solution: Reorganized 59+ view files into module directories matching controller structure: admin/, office-supplies/, property-management/, vehicle/, ticket-reservation/, common/; updated all controller view() references and view includes (e.g., profile.partials.* → common.profile.partials.*).
-- Key Learning: Views should align with controller organization for consistency and maintainability; kebab-case directory naming (office-supplies vs office_supplies) follows Laravel conventions; systematic update of both controller references and view includes critical for successful reorganization.
+-   Challenge/Decision: Views remained in single admin/ folder after controller reorganization, creating inconsistency and making module-specific views difficult to locate.
+-   Solution: Reorganized 59+ view files into module directories matching controller structure: admin/, office-supplies/, property-management/, vehicle/, ticket-reservation/, common/; updated all controller view() references and view includes (e.g., profile.partials._ → common.profile.partials._).
+-   Key Learning: Views should align with controller organization for consistency and maintainability; kebab-case directory naming (office-supplies vs office_supplies) follows Laravel conventions; systematic update of both controller references and view includes critical for successful reorganization.
 
 ### [MEM-023] Supply Fulfillment Testing & Department Assignment Fix (2025-11-03) ✅ COMPLETE
 
-- Challenge/Decision: Fulfillment testing revealed users without department assignments blocking distribution creation. supply_distributions.department_id is NOT NULL but users/requests lacked departments.
-- Solution: Updated DatabaseSeeder to assign default departments to all users (General Department id=1), corrected department IDs for Finance (8) and IT (17), ran migrate:fresh to apply clean state. Tested end-to-end: created request, approved via dept head & GA admin, partial fulfillment (5 of 10 units), verified stock reduction, distribution record, transaction record, request status update.
-- Key Learning: Department assignment is critical for fulfillment workflows. All users must have departments to enable proper data integrity in distribution tracking. Partial fulfillment correctly updates fulfilled_quantity and request status to 'partially_fulfilled', remaining 5 units can be fulfilled later.
+-   Challenge/Decision: Fulfillment testing revealed users without department assignments blocking distribution creation. supply_distributions.department_id is NOT NULL but users/requests lacked departments.
+-   Solution: Updated DatabaseSeeder to assign default departments to all users (General Department id=1), corrected department IDs for Finance (8) and IT (17), ran migrate:fresh to apply clean state. Tested end-to-end: created request, approved via dept head & GA admin, partial fulfillment (5 of 10 units), verified stock reduction, distribution record, transaction record, request status update.
+-   Key Learning: Department assignment is critical for fulfillment workflows. All users must have departments to enable proper data integrity in distribution tracking. Partial fulfillment correctly updates fulfilled_quantity and request status to 'partially_fulfilled', remaining 5 units can be fulfilled later.
 
 ### [MEM-024] Partial Fulfillment Workflow Fix (2025-11-03) ✅ COMPLETE
 
-- Challenge/Decision: Partially fulfilled requests not appearing in fulfillment queue and fulfill quantity showing wrong value (approved instead of remaining).
-- Solution: Updated SupplyFulfillmentController@index to include 'partially_fulfilled' status in WHERE IN clause; updated SupplyRequest@canBeFulfilled() to check for both 'approved' and 'partially_fulfilled'; updated fulfillment show view to calculate remaining = approved_quantity - fulfilled_quantity and display remaining quantity in Fulfill Qty field.
-- Key Learning: Partially fulfilled requests need to remain visible in fulfillment queue until completion. Fulfill quantity field must show remaining quantity (approved - fulfilled), not approved quantity, to prevent over-fulfillment.
+-   Challenge/Decision: Partially fulfilled requests not appearing in fulfillment queue and fulfill quantity showing wrong value (approved instead of remaining).
+-   Solution: Updated SupplyFulfillmentController@index to include 'partially_fulfilled' status in WHERE IN clause; updated SupplyRequest@canBeFulfilled() to check for both 'approved' and 'partially_fulfilled'; updated fulfillment show view to calculate remaining = approved_quantity - fulfilled_quantity and display remaining quantity in Fulfill Qty field.
+-   Key Learning: Partially fulfilled requests need to remain visible in fulfillment queue until completion. Fulfill quantity field must show remaining quantity (approved - fulfilled), not approved quantity, to prevent over-fulfillment.
 
 ### [MEM-025] Modal DataTable Supply Selection (2025-11-03) ✅ COMPLETE
 
-- Challenge/Decision: Regular select dropdown inefficient for 172+ inventory items; needed searchable, sortable interface for better UX when selecting supplies in request form.
-- Solution: Replaced select dropdown with Bootstrap modal containing DataTable. Added suppliesData() controller method with server-side processing, created modal with 25 items/page, search, sort capabilities. Fixed route order issue (supplies-data must come before supplies resource to avoid 404). Changed @push('scripts') to @push('js') for proper script loading.
-- Key Learning: Modal with DataTable provides efficient searchable interface for large item lists. Route ordering critical - specific routes (requests/supplies-data) must come before parameterized resource routes (supplies/{supply}) to prevent conflicts. Use @push('js') not @push('scripts') with Laravel stacks.
+-   Challenge/Decision: Regular select dropdown inefficient for 172+ inventory items; needed searchable, sortable interface for better UX when selecting supplies in request form.
+-   Solution: Replaced select dropdown with Bootstrap modal containing DataTable. Added suppliesData() controller method with server-side processing, created modal with 25 items/page, search, sort capabilities. Fixed route order issue (supplies-data must come before supplies resource to avoid 404). Changed @push('scripts') to @push('js') for proper script loading.
+-   Key Learning: Modal with DataTable provides efficient searchable interface for large item lists. Route ordering critical - specific routes (requests/supplies-data) must come before parameterized resource routes (supplies/{supply}) to prevent conflicts. Use @push('js') not @push('scripts') with Laravel stacks.
 
 ### [MEM-026] Supply Request UX Improvements (2025-11-03) ✅ COMPLETE
 
-- Challenge/Decision: Supply request forms needed confirmation dialog to prevent accidental submissions, and stock validation was too restrictive for planning purposes.
-- Solution: Added SweetAlert confirmation dialogs before submit (both create and edit forms). Removed `quantity-input.attr('max', stock)` validation - users can now request any quantity. Stock validation moved to fulfillment process where it belongs. Fixed edit.blade.php script loading directive.
-- Key Learning: Stock validation should occur at fulfillment/transaction time, not at request creation. Requests are planning documents; stock may change between request and fulfillment. SweetAlert confirms prevent accidental submissions and improve data quality.
+-   Challenge/Decision: Supply request forms needed confirmation dialog to prevent accidental submissions, and stock validation was too restrictive for planning purposes.
+-   Solution: Added SweetAlert confirmation dialogs before submit (both create and edit forms). Removed `quantity-input.attr('max', stock)` validation - users can now request any quantity. Stock validation moved to fulfillment process where it belongs. Fixed edit.blade.php script loading directive.
+-   Key Learning: Stock validation should occur at fulfillment/transaction time, not at request creation. Requests are planning documents; stock may change between request and fulfillment. SweetAlert confirms prevent accidental submissions and improve data quality.
+
+### [MEM-027] Roles DataTable Index Column Fix (2025-11-07) ✅ COMPLETE
+
+**Challenge**: Roles index view showed blank numbering because DataTables expected DT_RowIndex but server response omitted it and scripts loaded on wrong stack.
+**Solution**: Switched Blade stack to `@push('js')`, added `addIndexColumn()` in `RoleController@index`, and updated DataTable config to consume `DT_RowIndex` with default ordering.
+**Key Learning**: Yajra DataTables requires `addIndexColumn()` when the UI expects sequential numbering; Blade stack names must align with layout `@stack` directives to ensure scripts execute.

@@ -36,7 +36,7 @@
                             <table class="table table-bordered table-striped" id="tbl-roles">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
+                                        <th>#</th>
                                         <th>Name</th>
                                         <th>Permissions</th>
                                         <th>Users Count</th>
@@ -71,9 +71,9 @@
                 serverSide: true,
                 ajax: '{{ route('admin.roles.index') }}',
                 columns: [{
-                        data: 'id',
-                        name: 'id',
-                        orderable: true,
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
                         searchable: false
                     },
                     {
@@ -146,6 +146,9 @@
                             return html;
                         }
                     }
+                ],
+                order: [
+                    [1, 'asc']
                 ],
                 "responsive": true,
                 "lengthChange": false,

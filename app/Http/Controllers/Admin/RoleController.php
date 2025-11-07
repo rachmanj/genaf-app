@@ -30,6 +30,7 @@ class RoleController extends Controller
             $roles = Role::withCount('users')->with('permissions');
 
             return DataTables::of($roles)
+                ->addIndexColumn()
                 ->addColumn('permissions', function ($role) {
                     $permissions = $role->permissions->pluck('name')->toArray();
                     $permissionCount = count($permissions);
