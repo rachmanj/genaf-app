@@ -100,6 +100,14 @@ class SupplyRequest extends Model
     }
 
     /**
+     * Check if request is pending verification
+     */
+    public function isPendingVerification(): bool
+    {
+        return $this->status === 'pending_verification';
+    }
+
+    /**
      * Check if request is partially fulfilled
      */
     public function isPartiallyFulfilled(): bool

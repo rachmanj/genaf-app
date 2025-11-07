@@ -24,7 +24,7 @@ Route::prefix('pms')->middleware('auth')->name('pms.')->group(function () {
     Route::get('buildings/{building}/rooms', [\App\Http\Controllers\PropertyManagement\RoomController::class, 'byBuilding'])->name('buildings.rooms');
 
     // Reservations
-    Route::resource('reservations', \App\Http\Controllers\PropertyManagement\RoomReservationController::class)->only(['index','create','store']);
+    Route::resource('reservations', \App\Http\Controllers\PropertyManagement\RoomReservationController::class)->only(['index', 'create', 'store']);
     Route::post('reservations/check-availability', [\App\Http\Controllers\PropertyManagement\RoomReservationController::class, 'checkAvailability'])->name('reservations.check-availability');
 });
 
@@ -35,17 +35,28 @@ Route::middleware('auth')->group(function () {
 
     // Fuel Records - global listing and management
     Route::resource('fuel-records', \App\Http\Controllers\Vehicle\FuelRecordController::class)->only([
-        'index', 'create', 'store', 'edit', 'update', 'destroy',
+        'index',
+        'create',
+        'store',
+        'edit',
+        'update',
+        'destroy',
     ]);
 
     // Vehicle Maintenance - global listing and management
     Route::resource('vehicle-maintenance', \App\Http\Controllers\Vehicle\VehicleMaintenanceController::class)->only([
-        'index', 'create', 'store', 'edit', 'update', 'destroy',
+        'index',
+        'create',
+        'store',
+        'edit',
+        'update',
+        'destroy',
     ]);
 
     // Vehicle Documents - managed via upload/delete and secure download
     Route::resource('vehicle-documents', \App\Http\Controllers\Vehicle\VehicleDocumentController::class)->only([
-        'store', 'destroy',
+        'store',
+        'destroy',
     ]);
     Route::get('vehicle-documents/{document}/download', [\App\Http\Controllers\Vehicle\VehicleDocumentController::class, 'download'])
         ->name('vehicle-documents.download');
@@ -91,7 +102,7 @@ Route::middleware('auth')->group(function () {
         // Supplies data for modal selection (must be first to avoid route conflict)
         Route::get('requests/supplies-data', [\App\Http\Controllers\OfficeSupplies\SupplyRequestController::class, 'suppliesData'])
             ->name('supplies.requests.supplies-data');
-        
+
         Route::resource('requests', \App\Http\Controllers\OfficeSupplies\SupplyRequestController::class)->names([
             'index' => 'supplies.requests.index',
             'create' => 'supplies.requests.create',
@@ -107,11 +118,23 @@ Route::middleware('auth')->group(function () {
         Route::post('requests/{supplyRequest}/approve-ga-admin', [\App\Http\Controllers\OfficeSupplies\SupplyRequestController::class, 'approveGAAdmin'])->name('supplies.requests.approve-ga-admin');
         Route::post('requests/{supplyRequest}/reject-ga-admin', [\App\Http\Controllers\OfficeSupplies\SupplyRequestController::class, 'rejectGAAdmin'])->name('supplies.requests.reject-ga-admin');
 
-        // Supply Fulfillment Routes
+        // Supply Fulfillment Routes (specific routes must come before dynamic routes)
         Route::get('fulfillment', [\App\Http\Controllers\OfficeSupplies\SupplyFulfillmentController::class, 'index'])->name('supplies.fulfillment.index');
+        Route::get('fulfillment/history', [\App\Http\Controllers\OfficeSupplies\SupplyFulfillmentController::class, 'history'])->name('supplies.fulfillment.history');
+
+        // Verification Routes (must come before fulfillment/{request} to avoid route conflict)
+        Route::get('fulfillment/verification', [\App\Http\Controllers\OfficeSupplies\SupplyFulfillmentController::class, 'pendingVerification'])->name('supplies.fulfillment.pending-verification');
+        Route::get('fulfillment/verification/{distribution}', [\App\Http\Controllers\OfficeSupplies\SupplyFulfillmentController::class, 'verifyShow'])->name('supplies.fulfillment.verify-show');
+        Route::post('fulfillment/verification/{distribution}/verify', [\App\Http\Controllers\OfficeSupplies\SupplyFulfillmentController::class, 'verify'])->name('supplies.fulfillment.verify');
+        Route::post('fulfillment/verification/{distribution}/reject', [\App\Http\Controllers\OfficeSupplies\SupplyFulfillmentController::class, 'rejectVerification'])->name('supplies.fulfillment.reject');
+
+        // Rejected Distributions Routes (for GA Admin)
+        Route::get('fulfillment/rejected', [\App\Http\Controllers\OfficeSupplies\SupplyFulfillmentController::class, 'rejectedDistributions'])->name('supplies.fulfillment.rejected-distributions');
+        Route::get('fulfillment/rejected/{distribution}', [\App\Http\Controllers\OfficeSupplies\SupplyFulfillmentController::class, 'rejectedShow'])->name('supplies.fulfillment.rejected-show');
+
+        // Dynamic fulfillment routes (must come last)
         Route::get('fulfillment/{request}', [\App\Http\Controllers\OfficeSupplies\SupplyFulfillmentController::class, 'show'])->name('supplies.fulfillment.show');
         Route::post('fulfillment/{request}/fulfill', [\App\Http\Controllers\OfficeSupplies\SupplyFulfillmentController::class, 'fulfill'])->name('supplies.fulfillment.fulfill');
-        Route::get('fulfillment/history', [\App\Http\Controllers\OfficeSupplies\SupplyFulfillmentController::class, 'history'])->name('supplies.fulfillment.history');
 
         // Department Stock Routes
         Route::get('department-stock', [\App\Http\Controllers\OfficeSupplies\DepartmentStockController::class, 'index'])->name('supplies.department-stock.index');
@@ -192,6 +215,19 @@ Route::middleware('auth')->group(function () {
     Route::post('ticket-reservations/{ticketReservation}/mark-completed', [\App\Http\Controllers\TicketReservation\TicketReservationController::class, 'markCompleted'])->name('ticket-reservations.mark-completed');
     Route::post('ticket-reservations/{ticketReservation}/upload-document', [\App\Http\Controllers\TicketReservation\TicketReservationController::class, 'uploadDocument'])->name('ticket-reservations.upload-document');
     Route::delete('ticket-reservations/{ticketReservation}/delete-document/{document}', [\App\Http\Controllers\TicketReservation\TicketReservationController::class, 'deleteDocument'])->name('ticket-reservations.delete-document');
+});
+
+// Meeting Room Reservations Routes
+Route::prefix('meeting-rooms')->middleware('auth')->name('meeting-rooms.')->group(function () {
+    Route::resource('reservations', \App\Http\Controllers\MeetingRoomReservation\MeetingRoomReservationController::class);
+    Route::post('reservations/{reservation}/approve-dept-head', [\App\Http\Controllers\MeetingRoomReservation\MeetingRoomReservationController::class, 'approveDeptHead'])->name('reservations.approve-dept-head');
+    Route::post('reservations/{reservation}/reject-dept-head', [\App\Http\Controllers\MeetingRoomReservation\MeetingRoomReservationController::class, 'rejectDeptHead'])->name('reservations.reject-dept-head');
+    Route::post('reservations/{reservation}/approve-ga-admin', [\App\Http\Controllers\MeetingRoomReservation\MeetingRoomReservationController::class, 'approveGAAdmin'])->name('reservations.approve-ga-admin');
+    Route::post('reservations/{reservation}/reject-ga-admin', [\App\Http\Controllers\MeetingRoomReservation\MeetingRoomReservationController::class, 'rejectGAAdmin'])->name('reservations.reject-ga-admin');
+    Route::post('reservations/{reservation}/allocate-room', [\App\Http\Controllers\MeetingRoomReservation\MeetingRoomReservationController::class, 'allocateRoom'])->name('reservations.allocate-room');
+    Route::post('reservations/{reservation}/send-response', [\App\Http\Controllers\MeetingRoomReservation\MeetingRoomReservationController::class, 'sendResponse'])->name('reservations.send-response');
+    Route::post('reservations/check-availability', [\App\Http\Controllers\MeetingRoomReservation\MeetingRoomReservationController::class, 'checkAvailability'])->name('reservations.check-availability');
+    Route::get('allocation-diagram', [\App\Http\Controllers\MeetingRoomReservation\MeetingRoomReservationController::class, 'allocationDiagram'])->name('allocation-diagram');
 });
 
 Route::get('/dashboard', function () {

@@ -46,6 +46,7 @@ class SupplyRequestController extends Controller
                         'pending_ga_admin' => 'badge-info',
                         'approved' => 'badge-success',
                         'rejected' => 'badge-danger',
+                        'pending_verification' => 'badge-warning',
                         'partially_fulfilled' => 'badge-primary',
                         'fulfilled' => 'badge-success',
                         default => 'badge-secondary'
@@ -159,7 +160,7 @@ class SupplyRequestController extends Controller
             }
 
             DB::commit();
-            
+
             // Handle AJAX requests
             if ($request->ajax()) {
                 return response()->json([
@@ -168,12 +169,12 @@ class SupplyRequestController extends Controller
                     'redirect' => route('supplies.requests.index')
                 ]);
             }
-            
+
             return redirect()->route('supplies.requests.index')
                 ->with('success', 'Supply request created successfully.');
         } catch (\Exception $e) {
             DB::rollback();
-            
+
             // Handle AJAX requests
             if ($request->ajax()) {
                 return response()->json([
@@ -181,7 +182,7 @@ class SupplyRequestController extends Controller
                     'message' => 'Failed to create supply request: ' . $e->getMessage()
                 ], 422);
             }
-            
+
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Failed to create supply request: ' . $e->getMessage());
@@ -298,8 +299,10 @@ class SupplyRequestController extends Controller
         }
 
         // Security check: Department heads can only approve requests from their own department
-        if (!auth()->user()->canViewAllDepartments() && 
-            $supplyRequest->department_id !== auth()->user()->department_id) {
+        if (
+            !auth()->user()->canViewAllDepartments() &&
+            $supplyRequest->department_id !== auth()->user()->department_id
+        ) {
             return response()->json(['error' => 'You can only approve requests from your own department.'], 403);
         }
 
@@ -319,8 +322,10 @@ class SupplyRequestController extends Controller
         }
 
         // Security check: Department heads can only reject requests from their own department
-        if (!auth()->user()->canViewAllDepartments() && 
-            $supplyRequest->department_id !== auth()->user()->department_id) {
+        if (
+            !auth()->user()->canViewAllDepartments() &&
+            $supplyRequest->department_id !== auth()->user()->department_id
+        ) {
             return response()->json(['error' => 'You can only reject requests from your own department.'], 403);
         }
 

@@ -10,6 +10,7 @@ use App\Models\SupplyTransaction;
 use App\Models\Supply;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
 class SupplyFulfillmentController extends Controller
@@ -103,7 +104,7 @@ class SupplyFulfillmentController extends Controller
                     throw new \Exception("Insufficient stock for {$item->supply->name}. Available: {$item->supply->current_stock}, Requested: {$fulfillQuantity}");
                 }
 
-                // Create distribution record
+                // Create distribution record with pending verification
                 $distribution = SupplyDistribution::create([
                     'supply_id' => $item->supply_id,
                     'department_id' => $request->department_id,
@@ -112,6 +113,7 @@ class SupplyFulfillmentController extends Controller
                     'distribution_date' => $httpRequest->distribution_date,
                     'distributed_by' => auth()->id(),
                     'notes' => $httpRequest->notes,
+                    'verification_status' => 'pending', // Awaiting requestor verification
                 ]);
 
                 // Create outgoing transaction
@@ -138,13 +140,10 @@ class SupplyFulfillmentController extends Controller
                 $distributions[] = $distribution;
             }
 
-            // Update request status
-            $allItemsCompleted = $request->items->every(function ($item) {
-                return $item->fulfillment_status === 'completed';
-            });
-
+            // Update request status to pending_verification (awaiting requestor verification)
+            $request->refresh();
             $request->update([
-                'status' => $allItemsCompleted ? 'fulfilled' : 'partially_fulfilled',
+                'status' => 'pending_verification',
             ]);
 
             DB::commit();
@@ -192,5 +191,311 @@ class SupplyFulfillmentController extends Controller
         }
 
         return view('office-supplies.supply-fulfillment.history');
+    }
+
+    /**
+     * Show distributions pending verification by requestor
+     */
+    public function pendingVerification(Request $request)
+    {
+        if ($request->ajax()) {
+            $distributions = SupplyDistribution::with(['supply', 'department', 'distributedBy', 'requestItem.request'])
+                ->whereHas('requestItem.request', function ($query) {
+                    $query->where('employee_id', auth()->id());
+                })
+                ->where('verification_status', 'pending')
+                ->select('supply_distributions.*');
+
+            return DataTables::of($distributions)
+                ->addIndexColumn()
+                ->addColumn('form_number', function ($distribution) {
+                    return $distribution->form_number ?? 'N/A';
+                })
+                ->addColumn('supply_name', function ($distribution) {
+                    return $distribution->supply->name ?? 'N/A';
+                })
+                ->addColumn('supply_code', function ($distribution) {
+                    return $distribution->supply->code ?? 'N/A';
+                })
+                ->addColumn('department_name', function ($distribution) {
+                    return $distribution->department->department_name ?? 'N/A';
+                })
+                ->addColumn('distributed_by_name', function ($distribution) {
+                    return $distribution->distributedBy->name ?? 'N/A';
+                })
+                ->addColumn('distribution_date', function ($distribution) {
+                    return $distribution->distribution_date->format('M d, Y');
+                })
+                ->addColumn('request_reference', function ($distribution) {
+                    return $distribution->requestItem && $distribution->requestItem->request
+                        ? "#{$distribution->requestItem->request->form_number}"
+                        : 'N/A';
+                })
+                ->addColumn('days_pending', function ($distribution) {
+                    return $distribution->created_at->diffInDays(now());
+                })
+                ->addColumn('actions', function ($distribution) {
+                    $actions = '<div class="btn-group" role="group">';
+                    $actions .= '<a href="' . route('supplies.fulfillment.verify-show', $distribution->id) . '" class="btn btn-success btn-sm" title="Verify">';
+                    $actions .= '<i class="fas fa-check"></i> Verify';
+                    $actions .= '</a>';
+                    $actions .= '<button type="button" class="btn btn-danger btn-sm" onclick="rejectDistribution(' . $distribution->id . ')" title="Reject">';
+                    $actions .= '<i class="fas fa-times"></i> Reject';
+                    $actions .= '</button>';
+                    $actions .= '</div>';
+                    return $actions;
+                })
+                ->rawColumns(['actions'])
+                ->make(true);
+        }
+
+        return view('office-supplies.supply-fulfillment.pending-verification');
+    }
+
+    /**
+     * Show verification form for a distribution
+     */
+    public function verifyShow(SupplyDistribution $distribution)
+    {
+        // Security check: Only requestor can verify their own distributions
+        if (!$distribution->canBeVerifiedBy(auth()->user())) {
+            abort(403, 'You can only verify distributions from your own requests.');
+        }
+
+        $distribution->load(['supply', 'department', 'distributedBy', 'requestItem.request.employee']);
+
+        return view('office-supplies.supply-fulfillment.verify', compact('distribution'));
+    }
+
+    /**
+     * Verify distribution (requestor confirms receipt)
+     */
+    public function verify(Request $httpRequest, SupplyDistribution $distribution)
+    {
+        // Security check
+        if (!$distribution->canBeVerifiedBy(auth()->user())) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You can only verify distributions from your own requests.',
+            ], 403);
+        }
+
+        $httpRequest->validate([
+            'verification_notes' => 'nullable|string|max:1000',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            // Mark distribution as verified
+            $distribution->markAsVerified(auth()->user(), $httpRequest->verification_notes);
+
+            // Check if all distributions for this request are verified
+            $request = $distribution->requestItem->request;
+            $request->load(['items' => function ($query) {
+                $query->with('distributions');
+            }]);
+
+            $allVerified = true;
+            $hasRejected = false;
+
+            foreach ($request->items as $item) {
+                $itemDistributions = $item->distributions;
+                $nonVerifiedDistributions = $itemDistributions->where('verification_status', '!=', 'verified');
+                if ($nonVerifiedDistributions->isNotEmpty()) {
+                    $allVerified = false;
+                }
+
+                $rejectedDistributions = $itemDistributions->where('verification_status', 'rejected');
+                if ($rejectedDistributions->isNotEmpty()) {
+                    $hasRejected = true;
+                }
+            }
+
+            // Update request status based on verification
+            if ($hasRejected) {
+                // If any distribution is rejected, status remains pending_verification (GA Admin will review)
+                // Request status should allow GA Admin to see rejected items
+            } elseif ($allVerified) {
+                // All distributions verified, check if all items are completed
+                $allItemsCompleted = $request->items->every(function ($item) {
+                    return $item->fulfillment_status === 'completed';
+                });
+
+                $request->update([
+                    'status' => $allItemsCompleted ? 'fulfilled' : 'partially_fulfilled',
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Distribution verified successfully.',
+                'redirect' => route('supplies.fulfillment.pending-verification'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to verify distribution: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Reject distribution (requestor reports issue)
+     */
+    public function rejectVerification(Request $httpRequest, SupplyDistribution $distribution)
+    {
+        // Security check
+        if (!$distribution->canBeVerifiedBy(auth()->user())) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You can only reject distributions from your own requests.',
+            ], 403);
+        }
+
+        $httpRequest->validate([
+            'rejection_reason' => 'required|string|max:1000',
+            'verification_notes' => 'nullable|string|max:1000',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            // Mark distribution as rejected
+            $distribution->markAsRejected(
+                auth()->user(),
+                $httpRequest->rejection_reason,
+                $httpRequest->verification_notes
+            );
+
+            // Request status remains pending_verification
+            // GA Admin will see rejected distributions and can re-fulfill if needed
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Distribution rejected. GA Admin will review.',
+                'redirect' => route('supplies.fulfillment.pending-verification'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reject distribution: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Show rejected distributions for GA Admin review
+     */
+    public function rejectedDistributions(Request $request)
+    {
+        // Only GA Admin can view rejected distributions
+        if (!auth()->user()->hasPermissionTo('view supply fulfillment')) {
+            abort(403, 'You do not have permission to view rejected distributions.');
+        }
+
+        if ($request->ajax()) {
+            $distributions = SupplyDistribution::with([
+                'supply',
+                'department',
+                'distributedBy',
+                'requestItem.request.employee',
+                'verifiedBy'
+            ])
+                ->where('verification_status', 'rejected')
+                ->select('supply_distributions.*');
+
+            return DataTables::of($distributions)
+                ->addIndexColumn()
+                ->addColumn('form_number', function ($distribution) {
+                    return $distribution->form_number ?? 'N/A';
+                })
+                ->addColumn('supply_name', function ($distribution) {
+                    return $distribution->supply->name ?? 'N/A';
+                })
+                ->addColumn('supply_code', function ($distribution) {
+                    return $distribution->supply->code ?? 'N/A';
+                })
+                ->addColumn('department_name', function ($distribution) {
+                    return $distribution->department->department_name ?? 'N/A';
+                })
+                ->addColumn('requestor_name', function ($distribution) {
+                    return $distribution->requestItem && $distribution->requestItem->request && $distribution->requestItem->request->employee
+                        ? $distribution->requestItem->request->employee->name
+                        : 'N/A';
+                })
+                ->addColumn('distributed_by_name', function ($distribution) {
+                    return $distribution->distributedBy->name ?? 'N/A';
+                })
+                ->addColumn('distribution_date', function ($distribution) {
+                    return $distribution->distribution_date->format('M d, Y');
+                })
+                ->addColumn('rejected_at', function ($distribution) {
+                    return $distribution->verified_at ? $distribution->verified_at->format('M d, Y H:i') : 'N/A';
+                })
+                ->addColumn('rejected_by_name', function ($distribution) {
+                    return $distribution->verifiedBy->name ?? 'N/A';
+                })
+                ->addColumn('request_reference', function ($distribution) {
+                    return $distribution->requestItem && $distribution->requestItem->request
+                        ? "#{$distribution->requestItem->request->form_number}"
+                        : 'N/A';
+                })
+                ->addColumn('rejection_reason', function ($distribution) {
+                    return Str::limit($distribution->rejection_reason ?? 'N/A', 50);
+                })
+                ->addColumn('actions', function ($distribution) {
+                    $actions = '<div class="btn-group" role="group">';
+                    $actions .= '<a href="' . route('supplies.fulfillment.rejected-show', $distribution->id) . '" class="btn btn-info btn-sm" title="View Details">';
+                    $actions .= '<i class="fas fa-eye"></i> View';
+                    $actions .= '</a>';
+                    // Link to re-fulfill the request
+                    if ($distribution->requestItem && $distribution->requestItem->request) {
+                        $requestId = $distribution->requestItem->request->id;
+                        $actions .= '<a href="' . route('supplies.fulfillment.show', $requestId) . '" class="btn btn-primary btn-sm" title="Re-fulfill Request">';
+                        $actions .= '<i class="fas fa-redo"></i> Re-fulfill';
+                        $actions .= '</a>';
+                    }
+                    $actions .= '</div>';
+                    return $actions;
+                })
+                ->rawColumns(['actions'])
+                ->make(true);
+        }
+
+        return view('office-supplies.supply-fulfillment.rejected-distributions');
+    }
+
+    /**
+     * Show details of a rejected distribution
+     */
+    public function rejectedShow(SupplyDistribution $distribution)
+    {
+        // Only GA Admin can view rejected distributions
+        if (!auth()->user()->hasPermissionTo('view supply fulfillment')) {
+            abort(403, 'You do not have permission to view rejected distributions.');
+        }
+
+        if ($distribution->verification_status !== 'rejected') {
+            abort(404, 'Distribution is not rejected.');
+        }
+
+        $distribution->load([
+            'supply',
+            'department',
+            'distributedBy',
+            'requestItem.request.employee',
+            'verifiedBy'
+        ]);
+
+        return view('office-supplies.supply-fulfillment.rejected-show', compact('distribution'));
     }
 }

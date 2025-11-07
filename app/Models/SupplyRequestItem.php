@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SupplyRequestItem extends Model
 {
@@ -43,6 +44,14 @@ class SupplyRequestItem extends Model
     public function supply(): BelongsTo
     {
         return $this->belongsTo(Supply::class);
+    }
+
+    /**
+     * Get the distributions for this request item
+     */
+    public function distributions(): HasMany
+    {
+        return $this->hasMany(SupplyDistribution::class, 'request_item_id');
     }
 
     /**

@@ -70,12 +70,26 @@
                             @can('view supply fulfillment')
                                 <li class="nav-item">
                                     <a href="{{ route('supplies.fulfillment.index') }}"
-                                        class="nav-link {{ request()->routeIs('supplies.fulfillment.*') ? 'active' : '' }}">
+                                        class="nav-link {{ request()->routeIs('supplies.fulfillment.index') || request()->routeIs('supplies.fulfillment.show') || request()->routeIs('supplies.fulfillment.fulfill') || request()->routeIs('supplies.fulfillment.history') ? 'active' : '' }}">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Fulfillment</p>
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('supplies.fulfillment.rejected-distributions') }}"
+                                        class="nav-link {{ request()->routeIs('supplies.fulfillment.rejected-distributions') || request()->routeIs('supplies.fulfillment.rejected-show') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Rejected Distributions</p>
+                                    </a>
+                                </li>
                             @endcan
+                            <li class="nav-item">
+                                <a href="{{ route('supplies.fulfillment.pending-verification') }}"
+                                    class="nav-link {{ request()->routeIs('supplies.fulfillment.pending-verification') || request()->routeIs('supplies.fulfillment.verify-show') || request()->routeIs('supplies.fulfillment.verify') || request()->routeIs('supplies.fulfillment.reject') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Pending Verification</p>
+                                </a>
+                            </li>
                             @can('view department stock')
                                 <li class="nav-item">
                                     <a href="{{ route('supplies.department-stock.index') }}"
@@ -109,10 +123,44 @@
                     </li>
                 @endcan
 
+                <!-- Meeting Room Reservations -->
+                @can('view meeting room reservations')
+                    <li class="nav-item {{ request()->routeIs('meeting-rooms.*') ? 'menu-open' : '' }}">
+                        <a href="#"
+                            class="nav-link {{ request()->routeIs('meeting-rooms.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-door-open"></i>
+                            <p>
+                                Meeting Rooms
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('meeting-rooms.reservations.index') }}"
+                                    class="nav-link {{ request()->routeIs('meeting-rooms.reservations.*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Reservations</p>
+                                </a>
+                            </li>
+                            @can('view meeting room allocation diagram')
+                                <li class="nav-item">
+                                    <a href="{{ route('meeting-rooms.allocation-diagram') }}"
+                                        class="nav-link {{ request()->routeIs('meeting-rooms.allocation-diagram') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Allocation Diagram</p>
+                                    </a>
+                                </li>
+                            @endcan
+                        </ul>
+                    </li>
+                @endcan
+
                 <!-- Vehicle Administration -->
                 @can('view vehicles')
-                    <li class="nav-item {{ request()->routeIs('vehicles.*') || request()->routeIs('fuel-records.*') || request()->routeIs('vehicle-maintenance.*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs('vehicles.*') || request()->routeIs('fuel-records.*') || request()->routeIs('vehicle-maintenance.*') ? 'active' : '' }}">
+                    <li
+                        class="nav-item {{ request()->routeIs('vehicles.*') || request()->routeIs('fuel-records.*') || request()->routeIs('vehicle-maintenance.*') ? 'menu-open' : '' }}">
+                        <a href="#"
+                            class="nav-link {{ request()->routeIs('vehicles.*') || request()->routeIs('fuel-records.*') || request()->routeIs('vehicle-maintenance.*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-car"></i>
                             <p>
                                 Vehicle Administration
@@ -121,19 +169,22 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ route('vehicles.index') }}" class="nav-link {{ request()->routeIs('vehicles.*') ? 'active' : '' }}">
+                                <a href="{{ route('vehicles.index') }}"
+                                    class="nav-link {{ request()->routeIs('vehicles.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Vehicle Management</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('fuel-records.index') }}" class="nav-link {{ request()->routeIs('fuel-records.*') ? 'active' : '' }}">
+                                <a href="{{ route('fuel-records.index') }}"
+                                    class="nav-link {{ request()->routeIs('fuel-records.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Fuel Records</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('vehicle-maintenance.index') }}" class="nav-link {{ request()->routeIs('vehicle-maintenance.*') ? 'active' : '' }}">
+                                <a href="{{ route('vehicle-maintenance.index') }}"
+                                    class="nav-link {{ request()->routeIs('vehicle-maintenance.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Maintenance</p>
                                 </a>
@@ -144,8 +195,10 @@
 
                 <!-- Property Management -->
                 @can('view rooms')
-                    <li class="nav-item {{ request()->routeIs('rooms.*') || request()->routeIs('pms.*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs('rooms.*') || request()->routeIs('pms.*') ? 'active' : '' }}">
+                    <li
+                        class="nav-item {{ request()->routeIs('rooms.*') || request()->routeIs('pms.*') ? 'menu-open' : '' }}">
+                        <a href="#"
+                            class="nav-link {{ request()->routeIs('rooms.*') || request()->routeIs('pms.*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-bed"></i>
                             <p>
                                 Property Management
@@ -154,7 +207,8 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ route('pms.buildings.index') }}" class="nav-link {{ request()->routeIs('pms.buildings.*') ? 'active' : '' }}">
+                                <a href="{{ route('pms.buildings.index') }}"
+                                    class="nav-link {{ request()->routeIs('pms.buildings.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Buildings</p>
                                 </a>

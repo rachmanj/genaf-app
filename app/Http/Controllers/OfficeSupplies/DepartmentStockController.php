@@ -18,7 +18,12 @@ class DepartmentStockController extends Controller
                 ->select('departments.*');
 
             return DataTables::of($departments)
-                ->addIndexColumn()
+                ->addColumn('index', function ($department) {
+                    return '';
+                })
+                ->addColumn('department_name', function ($department) {
+                    return $department->department_name;
+                })
                 ->addColumn('status_badge', function ($department) {
                     $badgeClass = $department->status ? 'badge-success' : 'badge-danger';
                     $statusText = $department->status ? 'Active' : 'Inactive';
@@ -55,7 +60,7 @@ class DepartmentStockController extends Controller
     public function show(Department $department)
     {
         $department->load(['supplyDistributions.supply', 'supplyDistributions.distributedBy']);
-        
+
         // Get distribution summary by supply
         $distributionSummary = $department->supplyDistributions
             ->groupBy('supply_id')
@@ -76,7 +81,7 @@ class DepartmentStockController extends Controller
     public function report(Department $department)
     {
         $department->load(['supplyDistributions.supply', 'supplyDistributions.distributedBy']);
-        
+
         // Get distribution summary by supply
         $distributionSummary = $department->supplyDistributions
             ->groupBy('supply_id')

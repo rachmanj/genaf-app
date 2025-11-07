@@ -20,10 +20,16 @@ class SupplyDistribution extends Model
         'distribution_date',
         'distributed_by',
         'notes',
+        'verification_status',
+        'verified_by',
+        'verified_at',
+        'verification_notes',
+        'rejection_reason',
     ];
 
     protected $casts = [
         'distribution_date' => 'date',
+        'verified_at' => 'datetime',
     ];
 
     /**
@@ -56,6 +62,111 @@ class SupplyDistribution extends Model
     public function distributedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'distributed_by');
+    }
+
+    /**
+     * Get the user who verified the distribution.
+     */
+    public function verifiedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    /**
+     * Check if distribution can be verified by a user
+     */
+    public function canBeVerifiedBy(User $user): bool
+    {
+        // Only requestor (employee who made the request) can verify
+        if (!$this->requestItem || !$this->requestItem->request) {
+            return false;
+        }
+
+        return $this->verification_status === 'pending'
+            && $this->requestItem->request->employee_id === $user->id;
+    }
+
+    /**
+     * Check if distribution is pending verification
+     */
+    public function isPendingVerification(): bool
+    {
+        return $this->verification_status === 'pending';
+    }
+
+    /**
+     * Check if distribution is verified
+     */
+    public function isVerified(): bool
+    {
+        return $this->verification_status === 'verified';
+    }
+
+    /**
+     * Check if distribution is rejected
+     */
+    public function isRejected(): bool
+    {
+        return $this->verification_status === 'rejected';
+    }
+
+    /**
+     * Mark distribution as verified
+     */
+    public function markAsVerified(User $user, ?string $notes = null): void
+    {
+        $this->update([
+            'verification_status' => 'verified',
+            'verified_by' => $user->id,
+            'verified_at' => now(),
+            'verification_notes' => $notes,
+        ]);
+    }
+
+    /**
+     * Mark distribution as rejected
+     */
+    public function markAsRejected(User $user, string $reason, ?string $notes = null): void
+    {
+        $this->update([
+            'verification_status' => 'rejected',
+            'verified_by' => $user->id,
+            'verified_at' => now(),
+            'rejection_reason' => $reason,
+            'verification_notes' => $notes,
+        ]);
+    }
+
+    /**
+     * Get the request that this distribution belongs to (through request_item)
+     */
+    public function getRequestAttribute()
+    {
+        return $this->requestItem?->request;
+    }
+
+    /**
+     * Scope a query to only include pending verification distributions.
+     */
+    public function scopePendingVerification($query)
+    {
+        return $query->where('verification_status', 'pending');
+    }
+
+    /**
+     * Scope a query to only include verified distributions.
+     */
+    public function scopeVerified($query)
+    {
+        return $query->where('verification_status', 'verified');
+    }
+
+    /**
+     * Scope a query to only include rejected distributions.
+     */
+    public function scopeRejected($query)
+    {
+        return $query->where('verification_status', 'rejected');
     }
 
     /**
