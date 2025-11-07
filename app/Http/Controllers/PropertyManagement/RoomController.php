@@ -14,6 +14,7 @@ class RoomController extends Controller
 {
     public function index(Request $request): View
     {
+        $this->authorize('view rooms');
         $buildings = Building::orderBy('name')->get();
 
         $query = Room::query()
@@ -42,12 +43,14 @@ class RoomController extends Controller
 
     public function create(): View
     {
+        $this->authorize('create rooms');
         $buildings = Building::orderBy('name')->get();
         return view('property-management.rooms.create', compact('buildings'));
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $this->authorize('create rooms');
         $data = $request->validate([
             'building_id' => ['required', 'exists:buildings,id'],
             'room_number' => ['required', 'string', 'max:50'],
@@ -75,18 +78,21 @@ class RoomController extends Controller
 
     public function show(Room $room): View
     {
+        $this->authorize('view rooms');
         $room->load(['building', 'reservations', 'maintenances']);
         return view('property-management.rooms.show', compact('room'));
     }
 
     public function edit(Room $room): View
     {
+        $this->authorize('edit rooms');
         $buildings = Building::orderBy('name')->get();
         return view('property-management.rooms.edit', compact('room', 'buildings'));
     }
 
     public function update(Request $request, Room $room): RedirectResponse
     {
+        $this->authorize('edit rooms');
         $data = $request->validate([
             'building_id' => ['required', 'exists:buildings,id'],
             'room_number' => ['required', 'string', 'max:50'],
@@ -115,12 +121,14 @@ class RoomController extends Controller
 
     public function destroy(Room $room): RedirectResponse
     {
+        $this->authorize('delete rooms');
         $room->delete();
         return redirect()->route('pms.rooms.index')->with('success', 'Room deleted');
     }
 
     public function byBuilding(Building $building): JsonResponse
     {
+        $this->authorize('view rooms');
         $rooms = Room::where('building_id', $building->id)
             ->where('is_active', true)
             ->orderBy('floor')

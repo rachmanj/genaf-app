@@ -19,6 +19,8 @@ class RoomMaintenance extends Model
         'completed_date',
         'cost',
         'notes',
+        'status',
+        'assigned_to',
     ];
 
     protected function casts(): array
@@ -33,6 +35,11 @@ class RoomMaintenance extends Model
     public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class);
+    }
+
+    public function assignedTo(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
     }
 
     protected static function booted()

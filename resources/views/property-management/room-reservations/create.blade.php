@@ -43,21 +43,21 @@
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label>Guest Name</label>
-                                        <input type="text" name="guest_name" class="form-control" required>
+                                        <input type="text" name="guest_name" id="guest_name" class="form-control" required>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-4">
                                         <label>Company</label>
-                                        <input type="text" name="company" class="form-control">
+                                        <input type="text" name="company" id="company" class="form-control">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label>Phone</label>
-                                        <input type="text" name="phone" class="form-control" required>
+                                        <input type="text" name="phone" id="phone" class="form-control" required>
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label>Email</label>
-                                        <input type="email" name="email" class="form-control">
+                                        <input type="email" name="email" id="email" class="form-control">
                                     </div>
                                 </div>
                                 <div class="form-row">
@@ -182,10 +182,54 @@
             $('#btn-submit').prop('disabled', true);
         });
 
+        let unavailableDates = [];
+
+        function loadUnavailableDates(roomId) {
+            if (!roomId) {
+                unavailableDates = [];
+                return;
+            }
+            $.get("{{ route('pms.reservations.unavailable-dates') }}", {
+                room_id: roomId
+            }, function(resp) {
+                unavailableDates = resp.unavailable_dates || [];
+                updateDatePickerDisabledDates();
+            });
+        }
+
+        function updateDatePickerDisabledDates() {
+            const checkInInput = $('#check_in');
+            const checkOutInput = $('#check_out');
+            
+            // Update date range picker disabled dates
+            if ($('#date_range').data('daterangepicker')) {
+                $('#date_range').data('daterangepicker').remove();
+            }
+            
+            $('#date_range').daterangepicker({
+                minDate: moment(),
+                autoUpdateInput: true,
+                locale: { format: 'YYYY-MM-DD' },
+                isInvalidDate: function(date) {
+                    const dateStr = date.format('YYYY-MM-DD');
+                    return unavailableDates.includes(dateStr);
+                }
+            }, function(start, end) {
+                $('#check_in').val(start.format('YYYY-MM-DD')).trigger('change');
+                $('#check_out').val(end.format('YYYY-MM-DD')).trigger('change');
+            });
+        }
+
+        function isDateDisabled(dateStr) {
+            return unavailableDates.includes(dateStr);
+        }
+
         $('#room_id').on('change', function(){
+            const roomId = $(this).val();
             $('#availability_msg').html('');
             $('#cost_msg').html('');
             $('#btn-submit').prop('disabled', true);
+            loadUnavailableDates(roomId);
             checkAvailability();
         });
 
@@ -197,14 +241,49 @@
         $('#check_out').on('change', checkAvailability);
 
         // Date range picker linked to check_in/check_out
-        $('#date_range').daterangepicker({
-            minDate: moment(),
-            autoUpdateInput: true,
-            locale: { format: 'YYYY-MM-DD' }
-        }, function(start, end){
-            $('#check_in').val(start.format('YYYY-MM-DD')).trigger('change');
-            $('#check_out').val(end.format('YYYY-MM-DD')).trigger('change');
-        });
+        function initDateRangePicker() {
+            $('#date_range').daterangepicker({
+                minDate: moment(),
+                autoUpdateInput: true,
+                locale: { format: 'YYYY-MM-DD' },
+                isInvalidDate: function(date) {
+                    const dateStr = date.format('YYYY-MM-DD');
+                    return unavailableDates.includes(dateStr);
+                }
+            }, function(start, end){
+                $('#check_in').val(start.format('YYYY-MM-DD')).trigger('change');
+                $('#check_out').val(end.format('YYYY-MM-DD')).trigger('change');
+            });
+        }
+        initDateRangePicker();
+
+        // Guest info prefill
+        let guestInfoTimeout;
+        function fetchGuestInfo() {
+            const guestName = $('#guest_name').val().trim();
+            const phone = $('#phone').val().trim();
+            if (!guestName || guestName.length < 3) return;
+
+            clearTimeout(guestInfoTimeout);
+            guestInfoTimeout = setTimeout(function() {
+                $.get("{{ route('pms.reservations.guest-info') }}", {
+                    guest_name: guestName,
+                    phone: phone || null
+                }, function(data) {
+                    if (data.company && !$('#company').val()) {
+                        $('#company').val(data.company);
+                    }
+                    if (data.phone && !$('#phone').val()) {
+                        $('#phone').val(data.phone);
+                    }
+                    if (data.email && !$('#email').val()) {
+                        $('#email').val(data.email);
+                    }
+                });
+            }, 500);
+        }
+
+        $('#guest_name, #phone').on('blur', fetchGuestInfo);
     });
 </script>
 @endsection

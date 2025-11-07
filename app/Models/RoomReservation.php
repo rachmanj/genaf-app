@@ -24,6 +24,13 @@ class RoomReservation extends Model
         'total_cost',
         'notes',
         'created_by',
+        'approved_by',
+        'approved_at',
+        'checked_in_at',
+        'checked_out_at',
+        'cancelled_by',
+        'cancelled_at',
+        'cancellation_reason',
     ];
 
     protected function casts(): array
@@ -32,6 +39,10 @@ class RoomReservation extends Model
             'check_in' => 'date',
             'check_out' => 'date',
             'total_cost' => 'decimal:2',
+            'approved_at' => 'datetime',
+            'checked_in_at' => 'datetime',
+            'checked_out_at' => 'datetime',
+            'cancelled_at' => 'datetime',
         ];
     }
 
@@ -43,6 +54,16 @@ class RoomReservation extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function canceller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
     }
 
     protected static function booted()

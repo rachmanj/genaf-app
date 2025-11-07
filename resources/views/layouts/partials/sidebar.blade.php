@@ -126,8 +126,7 @@
                 <!-- Meeting Room Reservations -->
                 @can('view meeting room reservations')
                     <li class="nav-item {{ request()->routeIs('meeting-rooms.*') ? 'menu-open' : '' }}">
-                        <a href="#"
-                            class="nav-link {{ request()->routeIs('meeting-rooms.*') ? 'active' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('meeting-rooms.*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-door-open"></i>
                             <p>
                                 Meeting Rooms
@@ -195,10 +194,8 @@
 
                 <!-- Property Management -->
                 @can('view rooms')
-                    <li
-                        class="nav-item {{ request()->routeIs('rooms.*') || request()->routeIs('pms.*') ? 'menu-open' : '' }}">
-                        <a href="#"
-                            class="nav-link {{ request()->routeIs('rooms.*') || request()->routeIs('pms.*') ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->routeIs('pms.*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('pms.*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-bed"></i>
                             <p>
                                 Property Management
@@ -207,6 +204,20 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
+                                <a href="{{ route('pms.dashboard.index') }}"
+                                    class="nav-link {{ request()->routeIs('pms.dashboard.*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Dashboard</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('pms.calendar.index') }}"
+                                    class="nav-link {{ request()->routeIs('pms.calendar.*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Calendar</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{ route('pms.buildings.index') }}"
                                     class="nav-link {{ request()->routeIs('pms.buildings.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
@@ -214,15 +225,24 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="{{ route('pms.rooms.index') }}"
+                                    class="nav-link {{ request()->routeIs('pms.rooms.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Room Management</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="{{ route('pms.reservations.index') }}"
+                                    class="nav-link {{ request()->routeIs('pms.reservations.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Reservations</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('pms.maintenances.index') }}"
+                                    class="nav-link {{ request()->routeIs('pms.maintenances.*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Maintenances</p>
                                 </a>
                             </li>
                         </ul>

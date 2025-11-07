@@ -17,15 +17,32 @@ Route::middleware('auth')->group(function () {
 
 // PMS Routes
 Route::prefix('pms')->middleware('auth')->name('pms.')->group(function () {
+    // Dashboard
+    Route::get('dashboard', [\App\Http\Controllers\PropertyManagement\PmsDashboardController::class, 'index'])->name('dashboard.index');
+
     Route::resource('buildings', \App\Http\Controllers\PropertyManagement\BuildingController::class);
     Route::get('buildings/search', [\App\Http\Controllers\PropertyManagement\BuildingController::class, 'search'])->name('buildings.search');
     Route::resource('rooms', \App\Http\Controllers\PropertyManagement\RoomController::class);
     // Dependent select endpoint
     Route::get('buildings/{building}/rooms', [\App\Http\Controllers\PropertyManagement\RoomController::class, 'byBuilding'])->name('buildings.rooms');
 
+    // Calendar
+    Route::get('calendar', [\App\Http\Controllers\PropertyManagement\RoomReservationController::class, 'calendar'])->name('calendar.index');
+    Route::get('calendar/events', [\App\Http\Controllers\PropertyManagement\RoomReservationController::class, 'events'])->name('calendar.events');
+
     // Reservations
-    Route::resource('reservations', \App\Http\Controllers\PropertyManagement\RoomReservationController::class)->only(['index', 'create', 'store']);
+    Route::resource('reservations', \App\Http\Controllers\PropertyManagement\RoomReservationController::class)->only(['index', 'create', 'store', 'show']);
     Route::post('reservations/check-availability', [\App\Http\Controllers\PropertyManagement\RoomReservationController::class, 'checkAvailability'])->name('reservations.check-availability');
+    Route::get('reservations/unavailable-dates', [\App\Http\Controllers\PropertyManagement\RoomReservationController::class, 'getUnavailableDates'])->name('reservations.unavailable-dates');
+    Route::get('reservations/guest-info', [\App\Http\Controllers\PropertyManagement\RoomReservationController::class, 'getGuestInfo'])->name('reservations.guest-info');
+    Route::post('reservations/{reservation}/approve', [\App\Http\Controllers\PropertyManagement\RoomReservationController::class, 'approve'])->name('reservations.approve');
+    Route::post('reservations/{reservation}/check-in', [\App\Http\Controllers\PropertyManagement\RoomReservationController::class, 'checkIn'])->name('reservations.check-in');
+    Route::post('reservations/{reservation}/check-out', [\App\Http\Controllers\PropertyManagement\RoomReservationController::class, 'checkOut'])->name('reservations.check-out');
+    Route::post('reservations/{reservation}/cancel', [\App\Http\Controllers\PropertyManagement\RoomReservationController::class, 'cancel'])->name('reservations.cancel');
+
+    // Room Maintenances
+    Route::resource('maintenances', \App\Http\Controllers\PropertyManagement\RoomMaintenanceController::class);
+    Route::post('maintenances/{maintenance}/complete', [\App\Http\Controllers\PropertyManagement\RoomMaintenanceController::class, 'markComplete'])->name('maintenances.complete');
 });
 
 // Vehicle Administration Routes

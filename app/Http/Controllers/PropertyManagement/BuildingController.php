@@ -13,6 +13,8 @@ class BuildingController extends Controller
 {
     public function index(Request $request): View
     {
+        $this->authorize('view buildings');
+
         $query = Building::query()
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))
             ->when($request->filled('city'), fn ($q) => $q->where('city', 'like', '%' . $request->string('city') . '%'))
@@ -32,11 +34,13 @@ class BuildingController extends Controller
 
     public function create(): View
     {
+        $this->authorize('create buildings');
         return view('property-management.buildings.create');
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $this->authorize('create buildings');
         $data = $request->validate([
             'code' => ['required', 'string', 'max:50', 'unique:buildings,code'],
             'name' => ['required', 'string', 'max:255'],
@@ -61,6 +65,7 @@ class BuildingController extends Controller
 
     public function show(Building $building): View
     {
+        $this->authorize('view buildings');
         $building->load(['rooms' => function ($q) {
             $q->orderBy('floor')->orderBy('room_number');
         }]);
@@ -69,11 +74,13 @@ class BuildingController extends Controller
 
     public function edit(Building $building): View
     {
+        $this->authorize('edit buildings');
         return view('property-management.buildings.edit', compact('building'));
     }
 
     public function update(Request $request, Building $building): RedirectResponse
     {
+        $this->authorize('edit buildings');
         $data = $request->validate([
             'code' => ['required', 'string', 'max:50', 'unique:buildings,code,' . $building->id],
             'name' => ['required', 'string', 'max:255'],
@@ -98,12 +105,14 @@ class BuildingController extends Controller
 
     public function destroy(Building $building): RedirectResponse
     {
+        $this->authorize('delete buildings');
         $building->delete();
         return redirect()->route('pms.buildings.index')->with('success', 'Building deleted');
     }
 
     public function search(Request $request): JsonResponse
     {
+        $this->authorize('view buildings');
         $term = (string) $request->input('q', '');
         $results = Building::query()
             ->when($term !== '', function ($q) use ($term) {
