@@ -176,3 +176,63 @@
 **Challenge**: Roles index view showed blank numbering because DataTables expected DT_RowIndex but server response omitted it and scripts loaded on wrong stack.
 **Solution**: Switched Blade stack to `@push('js')`, added `addIndexColumn()` in `RoleController@index`, and updated DataTable config to consume `DT_RowIndex` with default ordering.
 **Key Learning**: Yajra DataTables requires `addIndexColumn()` when the UI expects sequential numbering; Blade stack names must align with layout `@stack` directives to ensure scripts execute.
+
+### [MEM-028] Meeting Room Reservation Workflow Launch (2025-11-06) ⚠️ PARTIAL
+
+**Challenge**: Deliver a meeting room booking system with department approvals, GA allocation, and catering requests while reusing AdminLTE patterns.  
+**Solution**: Implemented `MeetingRoomReservationController` with two-step approvals, room availability checks, and modal-driven actions; added `MeetingRoom`, `MeetingConsumptionRequest`, and supporting views with server-side DataTables.  
+**Key Learning**: Centralising department scoping via `User::canViewAllDepartments()` simplifies controller logic, but notification dispatch and consumption fulfilment must be addressed next to complete the workflow.
+
+### [MEM-030] ArkFleet Sync Queue & Permissions (2025-11-08) ✅ COMPLETE
+
+-   Challenge/Decision: Needed to prevent long-running ArkFleet sync requests and surface controlled bulk sync actions.  
+-   Solution: Introduced `ArkFleetSyncJob` to execute `ArkFleetSyncService` in the queue, updated `VehicleImportController` to dispatch jobs and parse manual unit lists, added vehicles index modal/buttons, and seeded new `import vehicles`/`sync vehicles` permissions.  
+-   Key Learning: Offloading sync to the queue keeps UI responsive and simplifies future scheduling/retry strategies; guarding routes with dedicated permissions ensures only GA Admin/Admin can trigger large imports.
+
+### [MEM-029] ArkFleet Integration Service Layer & Schema Update (2025-11-08) ✅ COMPLETE
+
+-   Challenge/Decision: Needed reliable scaffolding to ingest ARKFleet vehicles without disrupting existing vehicle features.
+-   Solution: Extended `vehicles` table (unit_no, plant_group, sync metadata, payload JSON), added ArkFleet service trio (API, import, sync) with shared mapping trait and status normalisation, stored raw payloads for audit, and deactivated units missing from the latest sync.
+-   Key Learning: Centralizing mapping logic and persisting source payloads simplifies reconciliation and future UI work; marking missing units during sync prevents stale records but requires queue orchestration to avoid overlapping jobs.
+
+### [MEM-031] Vehicle Index Unit No Column (2025-11-08) ✅ COMPLETE
+
+-   Challenge/Decision: GA admins need to confirm ARKFleet unit numbers on the local vehicles grid before initiating sync/import troubleshooting.
+-   Solution: Updated `VehicleController@index` JSON payload and vehicles index DataTable to surface `unit_no`, realigned filters with the new column order, and refreshed UI plan/docs to track remaining sync metadata work.
+-   Key Learning: Keeping ARKFleet identifiers visible in core lists avoids context switching to the import screen; when adjusting DataTables column order, update filter indices and documentation together to prevent regressions.
+
+### [MEM-032] Preserve ARKFleet License Plate Mapping (2025-11-08) ✅ COMPLETE
+
+-   Challenge/Decision: Import routine was substituting `unit_no` for `nomor_polisi` when ARKFleet omitted the plate, leading to mismatched data between systems.
+-   Solution: Adjusted `MapsArkFleetVehicles` to read both snake_case and camelCase payload keys and stop auto-generating fallback values so GENAF mirrors ARKFleet exactly.
+-   Key Learning: External identifiers must remain authoritative—avoid fabricating stand-ins that can mask missing data and break reconciliation workflows.
+
+### [MEM-033] Vehicle Index Current Project Column (2025-11-08) ✅ COMPLETE
+
+-   Challenge/Decision: GA admins needed visibility into ARKFleet project assignments inside the core vehicles grid to validate sync decisions without leaving the page.
+-   Solution: Extended the vehicles index API response and DataTable to include `current_project_code`, adjusted column order, and kept filter bindings accurate after the insert.
+-   Key Learning: When enriching client-side DataTables, audit filter indices and documentation simultaneously to prevent subtle UI regressions as column counts change.
+
+### [MEM-034] Vehicle Index Sync Indicators (2025-11-08) ✅ COMPLETE
+
+-   Challenge/Decision: Support staff needed at-a-glance insight into each vehicle’s ARKFleet sync health without drilling into logs.
+-   Solution: Exposed raw sync status/message fields through the index endpoint, rendered pill badges with severity colouring, and formatted `arkfleet_synced_at` with human-readable + absolute timestamps.
+-   Key Learning: Pairing relative and absolute timestamps keeps operators informed about freshness while badge colours surface error states immediately; always pass both raw and display values to DataTables renderers for consistent sorting.
+
+### [MEM-035] Vehicle Document Data Model Foundation (2025-11-08) ✅ COMPLETE
+
+-   Challenge/Decision: Existing vehicle document storage lacked typed metadata, renewal history, and reminder-friendly fields.
+-   Solution: Introduced `vehicle_document_types`, remodelled `vehicle_documents` with document number/dates/supplier/amount, added revision audit table, automatic revision snapshots, and seeded STNK/KIR defaults.
+-   Key Learning: Capturing renewals as immutable snapshots (with user attribution) sets the stage for expiry monitoring and UI tooling—ensure migrations backfill legacy data and factories/tests cover the new relationships early.
+
+### [MEM-036] Vehicle Documents UI & History Modal (2025-11-08) ✅ COMPLETE
+
+-   Challenge/Decision: GA admins needed a single place inside the vehicle profile to view, add, and extend STNK/KIR records while seeing prior renewals.
+-   Solution: Added Documents tab with status badges, modal-driven create/edit flow, downloadable attachments, and a revision history modal sourced from the new audit table; wired update endpoint + permissions and expanded feature tests.
+-   Key Learning: Precomputing document metadata (status labels, formatted URLs, revisions) in the controller simplified Blade + JS logic; consolidating create/edit into one modal required hidden context inputs to restore form state after validation failures.
+
+### [MEM-037] Local Login Seed & Session Fix (2025-11-08) ✅ COMPLETE
+
+-   Challenge/Decision: Browser-based QA blocked because seeded credentials didn’t match the documented `superadmin / 20132013` account and the session cookie shipped with `secure` enabled, triggering repeated 419s over HTTP.
+-   Solution: Updated `DatabaseSeeder` to create a `superadmin` user (and other fixtures) with password `20132013`, refreshed the vehicle sample data to mirror ArkFleet attributes, defaulted the session secure-cookie flag to `false` for local use, and added a dev-only `/dev-login` helper route for quick manual sign-in.
+-   Key Learning: Aligning seed data with expected QA credentials eliminates wasted debugging cycles; local environments must disable secure-only cookies when testing over plain HTTP, and a guarded helper route accelerates smoke tests without touching production configs.

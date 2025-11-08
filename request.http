@@ -1,0 +1,4 @@
+GET http://localhost:5000/api/equipments
+
+###
+GET http://localhost:5000/api/equipments/by-unit/VA 055

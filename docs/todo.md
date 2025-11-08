@@ -49,9 +49,16 @@ Include relevant context in brackets to help with future AI-assisted coding:
 
 ## Up Next (This Week)
 
+-   `[ ] P1: Implement Meeting Reservation Notifications [MeetingRoomReservationController@sendResponse, notification channels]`
+-   `[ ] P1: Complete Meeting Consumption Fulfillment Workflow [meeting_consumption_requests.fulfilled* fields, GA admin UI]`
+-   `[ ] P1: Replace VehicleController placeholders with full CRUD + validation [VehicleController@store/update/destroy]`
+-   `[ ] P1: Persist Fuel/Maintenance forms with validation & form numbers [FuelRecordController@store, VehicleMaintenanceController@store]`
+-   `[ ] P1: Execute ARKFleet live import/sync smoke tests once API access confirmed [ArkFleetApiService staging credentials]`
+-   `[testing] P1: Surface ARKFleet metadata on Vehicle index [vehicle/vehicles/index.blade.php columns (unit_no/current_project_code/ sync badges ✅), validate with live data]`
+-   `[done] P1: Vehicle document data model & revision history [vehicle_document_types seeding, vehicle_documents schema refactor, VehicleDocumentRevision events/tests] (completed: 2025-11-08)`
 -   `[ ] P2: Add Mobile-Optimized Counting Interface [admin/stock-opname/count.blade.php]`
--   `[ ] P2: Implement Export Functionality for Stock Opname Reports [Excel/PDF export]`
--   `[ ] P2: Add Property Management System [waiting for next priority decision]`
+-   `[ ] P2: Implement Export Functionality for Stock Opname Reports [StockOpnameController@export, Excel/PDF]`
+-   `[ ] P2: Design PMS Overview Dashboard Widgets [PmsDashboardController@index metrics review]`
 -   `[ ] P2: Vehicle Administration – migrate to server-side DataTables when datasets grow`
 
 ## Blocked/Waiting
@@ -65,6 +72,9 @@ Include relevant context in brackets to help with future AI-assisted coding:
 -   `[done] P1: Implement Modal with DataTable for Supply Selection [replaced select dropdown with searchable modal, 172+ items] (completed: 2025-11-03)`
 -   `[done] P1: Fix Partial Fulfillment Workflow [show partially_fulfilled requests, calculate remaining quantity correctly] (completed: 2025-11-03)`
 -   `[done] P1: Test Supply Fulfillment Functionality [partial fulfillment, stock reduction, distribution & transaction tracking] (completed: 2025-11-03)`
+-   `[done] P1: Prep ARKFleet integration scaffolding [ArkFleetApiService, ArkFleetImportService, ArkFleetSyncService, vehicles migration] (completed: 2025-11-08)`
+-   `[done] P1: Build ARKFleet import browse UI with bulk selection [VehicleImportController@index, vehicle/import.blade.php] (completed: 2025-11-08)`
+-   `[done] P1: Wire manual sync actions to ArkFleetSyncService via queue [VehicleImportController@sync*, ArkFleetSyncJob, vehicles/index buttons] (completed: 2025-11-08)`
 -   `[done] P1: Fix Stock Opname Approval Workflow [database enum migrations, eager loading fix, complete end-to-end testing] (completed: 2025-01-31)`
 -   `[done] P1: Complete Stock Opname Testing [session creation, start, counting, verification, complete] (completed: 2025-01-31)`
 -   `[done] P1: Create comprehensive test scenario for Office Supplies module [8 tests, complete workflow] (completed: 2025-01-26)`

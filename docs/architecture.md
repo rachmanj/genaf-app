@@ -150,7 +150,47 @@ A comprehensive enterprise management system for GENAF company covering office s
 -   **Responsive Design**: Mobile-friendly interface
 -   **Theme System**: Professional AdminLTE styling
 
-### 4. Office Supplies Management
+### 4. Meeting Room Reservation System
+
+-   **Scope**: End-to-end meeting room booking with day-level consumption requests
+-   **Workflow**: Two-step approval (Department Head → GA Admin) before room allocation and confirmation
+-   **Room Allocation**: GA Admin assigns available rooms; system validates schedule overlaps and capacity
+-   **Consumption Requests**: Optional per-day catering flags captured in `meeting_consumption_requests`
+-   **Security**: Department scoping enforced via `User::canViewAllDepartments()` and permission checks
+-   **User Experience**: AdminLTE layout with server-side DataTables filters, SweetAlert2 confirmations, and modals for rejection, allocation, and response steps
+-   **Calendar Dashboard**: Combined reservation/maintenance timeline for capacity planning
+
+#### Routes
+
+```php
+Route::prefix('meeting-rooms')->middleware('auth')->name('meeting-rooms.')->group(function () {
+    Route::resource('reservations', \App\Http\Controllers\MeetingRoomReservation\MeetingRoomReservationController::class);
+    Route::post('reservations/{reservation}/approve-dept-head', [...])->name('reservations.approve-dept-head');
+    Route::post('reservations/{reservation}/reject-dept-head', [...])->name('reservations.reject-dept-head');
+    Route::post('reservations/{reservation}/approve-ga-admin', [...])->name('reservations.approve-ga-admin');
+    Route::post('reservations/{reservation}/reject-ga-admin', [...])->name('reservations.reject-ga-admin');
+    Route::post('reservations/{reservation}/allocate-room', [...])->name('reservations.allocate-room');
+    Route::post('reservations/{reservation}/send-response', [...])->name('reservations.send-response');
+    Route::post('reservations/{reservation}/check-availability', [...])->name('reservations.check-availability');
+    Route::get('calendar', [...])->name('calendar.index');
+    Route::get('calendar/events', [...])->name('calendar.events');
+    Route::get('allocation-diagram', [...])->name('allocation-diagram');
+});
+```
+
+#### Models
+
+-   `App\Models\MeetingRoom` with `isAvailableForMeeting()` schedule conflict detection
+-   `App\Models\MeetingRoomReservation` covering approval helpers, meeting date utilities, and relationships
+-   `App\Models\MeetingConsumptionRequest` tracking coffee breaks/lunch/dinner fulfillment per day
+
+#### Files
+
+-   Views reside under `resources/views/meeting-room-reservation/reservations/**` with modal workflows
+-   Allocation diagram view renders room availability timeline
+-   JavaScript hooks bundled via `@push('js')` to keep script stack aligned with layouts
+
+### 5. Office Supplies Management
 
 -   **Supply Master Data**: Supply items with stock tracking
 -   **Supply Requests**: Two-level approval workflow (Dept Head → GA Admin)
@@ -160,13 +200,14 @@ A comprehensive enterprise management system for GENAF company covering office s
 -   **Departments**: Department management with API sync preparation
 -   **Stock Opname**: Physical inventory count with gradual counting support
 
-### 5. Vehicle Administration
+### 6. Vehicle Administration
 
 -   Vehicles registry with CRUD and status
 -   Fuel Records with odometer and cost tracking
--   Vehicle Documents with expiry alerts and secure file storage
+-   Vehicle Documents with structured metadata (type, number, supplier, cost), expiry alerts, revision history, and secure file storage
 -   Vehicle Maintenance with next service scheduling
 -   Dashboard widgets for expiring docs and upcoming services
+-   ArkFleet integration layer: schema extensions (`unit_no`, `nomor_polisi`, `plant_group`, sync metadata) plus dedicated services (`ArkFleetApiService`, `ArkFleetImportService`, `ArkFleetSyncService`) and queued job `ArkFleetSyncJob` for ingesting remote payloads, storing raw JSON history, and asynchronously flagging missing units
 
 #### UI Patterns (Aligned with Supplies)
 
@@ -194,7 +235,9 @@ Route::middleware('auth')->group(function () {
 
 -   `App\Models\Vehicle` with relations: `fuelRecords`, `documents`, `maintenances`, helper `lastOdometer()`
 -   `App\Models\FuelRecord` belongsTo `vehicle`, `recorder`
--   `App\Models\VehicleDocument` scope `expiringWithin(days)`
+-   `App\Models\VehicleDocument` belongsTo `VehicleDocumentType`, hasMany `VehicleDocumentRevision`, scope `expiringWithin(days)` to monitor `due_date`
+-   `App\Models\VehicleDocumentType` master data with default validity/reminder windows
+-   `App\Models\VehicleDocumentRevision` audit trail capturing each extension/renewal with optional `changed_by`
 -   `App\Models\VehicleMaintenance` scope `upcoming(days)`
 
 #### Files
@@ -203,7 +246,7 @@ Route::middleware('auth')->group(function () {
 -   Sidebar links wired to `vehicles.index`, `fuel-records.index`, `vehicle-maintenance.index`
 -   Dashboard small boxes for expiring documents and upcoming services
 
-### 6. Data Management
+### 7. Data Management
 
 -   **DataTables Integration**: Server-side processing for large datasets
 -   **Search & Filtering**: Advanced search capabilities
@@ -368,6 +411,128 @@ stock_adjustments
 └── updated_at
 ```
 
+#### Meeting Rooms & Reservations
+
+```sql
+meeting_rooms
+├── id (primary key)
+├── name (unique)
+├── location
+├── capacity
+├── facilities (nullable)
+├── is_active (boolean)
+├── created_at
+└── updated_at
+
+meeting_room_reservations
+├── id (primary key)
+├── form_number (unique)
+├── requestor_id (foreign key → users.id)
+├── department_id (foreign key → departments.id)
+├── requested_room_id (nullable FK → meeting_rooms.id)
+├── allocated_room_id (nullable FK → meeting_rooms.id)
+├── location
+├── meeting_title
+├── meeting_date_start
+├── meeting_date_end (nullable)
+├── meeting_time_start
+├── meeting_time_end
+├── participant_count
+├── required_facilities (nullable)
+├── status (pending_dept_head, pending_ga_admin, approved, confirmed, rejected, cancelled)
+├── department_head_approved_by / _at / rejection_reason
+├── ga_admin_approved_by / _at / rejection_reason
+├── room_allocated_at
+├── response_sent_at
+├── response_notes (nullable)
+├── notes (nullable)
+├── created_at
+└── updated_at
+
+meeting_consumption_requests
+├── id (primary key)
+├── reservation_id (foreign key → meeting_room_reservations.id)
+├── consumption_date
+├── consumption_type (coffee_break_morning, coffee_break_afternoon, lunch, dinner)
+├── requested (boolean)
+├── description (nullable)
+├── fulfilled (boolean)
+├── fulfilled_at (nullable)
+├── fulfilled_by (nullable FK → users.id)
+├── notes (nullable)
+├── created_at
+└── updated_at
+```
+
+#### Vehicles
+
+```sql
+vehicles
+├── id (primary key)
+├── unit_no (unique, nullable)              # ArkFleet primary identifier
+├── nomor_polisi (unique)
+├── brand
+├── model
+├── year (nullable integer)
+├── plant_group (nullable)
+├── current_odometer
+├── status (active, maintenance, retired, inactive, scrap, sold)
+├── current_project_code (nullable)
+├── remarks (nullable)
+├── arkfleet_synced_at (nullable timestamp)
+├── arkfleet_sync_status (never, imported, synced, missing)
+├── arkfleet_sync_message (nullable text)
+├── arkfleet_last_payload (nullable JSON)
+├── is_active (boolean)
+├── created_at
+└── updated_at
+```
+
+#### Vehicle Document Management
+
+```sql
+vehicle_document_types
+├── id (primary key)
+├── name (unique)
+├── slug (unique)
+├── default_validity_days (nullable integer)
+├── default_reminder_days (default 90)
+├── description (nullable)
+├── created_at
+└── updated_at
+
+vehicle_documents
+├── id (primary key)
+├── form_number (unique)
+├── vehicle_id (foreign key → vehicles.id)
+├── vehicle_document_type_id (foreign key → vehicle_document_types.id)
+├── document_number
+├── document_date (nullable)
+├── due_date (nullable)
+├── supplier (nullable)
+├── amount (nullable decimal(12,2))
+├── file_path (nullable)
+├── notes (nullable)
+├── created_at
+└── updated_at
+
+vehicle_document_revisions
+├── id (primary key)
+├── vehicle_document_id (foreign key → vehicle_documents.id)
+├── document_number (nullable)
+├── document_date (nullable)
+├── due_date (nullable)
+├── supplier (nullable)
+├── amount (nullable decimal(12,2))
+├── file_path (nullable)
+├── notes (nullable)
+├── changed_by (nullable FK → users.id)
+├── created_at
+└── updated_at
+```
+
+ArkFleet services persist raw payloads in `arkfleet_last_payload`, map remote statuses into the local enum set, and mark vehicles omitted from the latest sync as inactive with `arkfleet_sync_status = 'missing'`.
+
 ### Permission System
 
 The system includes 58 comprehensive permissions covering:
@@ -378,7 +543,7 @@ The system includes 58 comprehensive permissions covering:
 -   Office Supplies (8 permissions)
 -   Ticket Reservations (5 permissions)
 -   Property Management (8 permissions)
--   Vehicle Administration (10 permissions)
+-   Vehicle Administration (12 permissions, including ArkFleet import/sync)
 -   Asset Inventory (10 permissions)
 -   Reports (2 permissions)
 -   System Settings (2 permissions)
@@ -512,6 +677,10 @@ resources/views/
 │   ├── buildings/
 │   ├── rooms/
 │   └── room-reservations/
+│
+├── meeting-room-reservation/  # Meeting Room Reservation Module
+│   ├── reservations/
+│   └── allocation-diagram.blade.php
 │
 ├── vehicle/                   # Vehicle Administration Module
 │   ├── vehicles/
@@ -684,13 +853,25 @@ All views follow consistent patterns:
     -   Departments Management with API sync preparation
     -   Stock Opname Module (Physical Inventory Count) - 95% complete
 
-### 🚧 Next Modules
+-   **Module 3**: Ticket Reservation Management (100% complete)
+    -   Multi-type ticket requests (flight, train, bus, hotel)
+    -   Approval workflow (pending → approved/rejected → booked → completed)
+    -   Document upload/delete with secure storage
+    -   Advanced DataTable filters (status, ticket type, employee, date range)
+    -   Manual booking reference capture and completion tracking
 
--   **Module 3**: Ticket Reservation Management
+### 🚧 In Progress Modules
+
 -   **Module 4**: Property Management System
--   **Module 5**: Vehicle Administration
--   **Module 6**: Asset Inventory Management
--   **Module 7**: Dashboard & Reporting
+-   **Module 5**: Meeting Room Reservation (beta)
+    -   Missing notification dispatch after GA decisions (`sendResponse()` TODO)
+    -   Consumption fulfillment workflow pending (`fulfilled`, `fulfilled_at` fields unused)
+    -   Requires GA Admin dashboard widget for upcoming meetings
+-   **Module 6**: Vehicle Administration
+    -   Controllers currently return placeholder responses; persistence and validation pending
+    -   Awaiting ARKFleet integration (see integration plan)
+-   **Module 7**: Asset Inventory Management
+-   **Module 8**: Dashboard & Reporting
 
 ## Development Patterns
 

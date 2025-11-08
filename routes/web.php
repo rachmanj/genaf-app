@@ -47,6 +47,20 @@ Route::prefix('pms')->middleware('auth')->name('pms.')->group(function () {
 
 // Vehicle Administration Routes
 Route::middleware('auth')->group(function () {
+    // ArkFleet Import & Sync
+    Route::get('vehicles/import', [\App\Http\Controllers\Vehicle\VehicleImportController::class, 'index'])
+        ->middleware('can:import vehicles')
+        ->name('vehicles.import.index');
+    Route::post('vehicles/import', [\App\Http\Controllers\Vehicle\VehicleImportController::class, 'store'])
+        ->middleware('can:import vehicles')
+        ->name('vehicles.import.store');
+    Route::post('vehicles/import/sync-selected', [\App\Http\Controllers\Vehicle\VehicleImportController::class, 'syncSelected'])
+        ->middleware('can:sync vehicles')
+        ->name('vehicles.import.sync-selected');
+    Route::post('vehicles/import/sync-all', [\App\Http\Controllers\Vehicle\VehicleImportController::class, 'syncAll'])
+        ->middleware('can:sync vehicles')
+        ->name('vehicles.import.sync-all');
+
     // Vehicle registry
     Route::resource('vehicles', \App\Http\Controllers\Vehicle\VehicleController::class);
 
@@ -73,11 +87,20 @@ Route::middleware('auth')->group(function () {
     // Vehicle Documents - managed via upload/delete and secure download
     Route::resource('vehicle-documents', \App\Http\Controllers\Vehicle\VehicleDocumentController::class)->only([
         'store',
+        'update',
         'destroy',
     ]);
     Route::get('vehicle-documents/{document}/download', [\App\Http\Controllers\Vehicle\VehicleDocumentController::class, 'download'])
         ->name('vehicle-documents.download');
 });
+
+if (app()->environment('local')) {
+    Route::get('/dev-login', function () {
+        \Illuminate\Support\Facades\Auth::loginUsingId(1);
+        request()->session()->regenerate();
+        return redirect()->route('dashboard');
+    });
+}
 
 // Admin Routes
 Route::prefix('admin')->middleware('auth')->group(function () {

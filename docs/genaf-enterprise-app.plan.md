@@ -261,7 +261,9 @@ A comprehensive enterprise management system for GENAF company covering office s
 
 -   `vehicles` (id, plate_number, brand, model, year, type, current_odometer, status)
 -   `fuel_records` (id, vehicle_id, date, odometer, liters, cost, gas_station, receipt_no)
--   `vehicle_documents` (id, vehicle_id, document_type[STNK/Insurance/KIR/etc], issue_date, expiry_date, cost, file_path)
+-   `vehicle_document_types` (id, name, slug, default_validity_days, default_reminder_days, description)
+-   `vehicle_documents` (id, vehicle_id, vehicle_document_type_id, document_number, document_date, due_date, supplier, amount, file_path, notes)
+-   `vehicle_document_revisions` (id, vehicle_document_id, document_number, document_date, due_date, supplier, amount, file_path, notes, changed_by, timestamps)
 -   `vehicle_maintenances` (id, vehicle_id, maintenance_type, service_date, odometer, cost, vendor, next_service_date, next_service_odometer, notes)
 
 ### 6. Asset Inventory Management

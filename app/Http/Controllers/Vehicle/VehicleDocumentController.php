@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Vehicle;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VehicleDocument\VehicleDocumentStoreRequest;
+use App\Http\Requests\VehicleDocument\VehicleDocumentUpdateRequest;
 use App\Models\VehicleDocument;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Request;
 
 class VehicleDocumentController extends Controller
 {
@@ -20,25 +20,48 @@ class VehicleDocumentController extends Controller
             $data['file_path'] = $path;
         }
 
+        unset($data['file']);
+
         VehicleDocument::create($data);
 
         return back()->with('success', 'Document uploaded');
     }
 
-    public function destroy($id)
+    public function update(VehicleDocumentUpdateRequest $request, VehicleDocument $vehicleDocument)
     {
-        $document = VehicleDocument::findOrFail($id);
-        Gate::authorize('delete vehicle documents');
-        if ($document->file_path) {
-            Storage::disk('public')->delete($document->file_path);
+        $data = $request->validated();
+
+        if ($request->hasFile('file')) {
+            if ($vehicleDocument->file_path) {
+                Storage::disk('public')->delete($vehicleDocument->file_path);
+            }
+
+            $data['file_path'] = $request->file('file')->store(
+                'vehicle-documents/' . $vehicleDocument->vehicle_id,
+                'public'
+            );
         }
-        $document->delete();
+
+        unset($data['file'], $data['vehicle_id']);
+
+        $vehicleDocument->fill($data);
+        $vehicleDocument->save();
+
+        return back()->with('success', 'Document updated');
+    }
+
+    public function destroy(VehicleDocument $vehicleDocument)
+    {
+        Gate::authorize('delete vehicle documents');
+        if ($vehicleDocument->file_path) {
+            Storage::disk('public')->delete($vehicleDocument->file_path);
+        }
+        $vehicleDocument->delete();
         return back()->with('success', 'Document deleted');
     }
 
-    public function download($documentId)
+    public function download(VehicleDocument $document)
     {
-        $document = VehicleDocument::findOrFail($documentId);
         Gate::authorize('download vehicle documents');
         if (!$document->file_path || !Storage::disk('public')->exists($document->file_path)) {
             abort(404);

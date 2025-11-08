@@ -18,14 +18,15 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             DepartmentSeeder::class,
             ProjectSeeder::class,
+            VehicleDocumentTypeSeeder::class,
         ]);
 
         // Create users and assign roles BEFORE other seeders that reference users
         $adminUser = User::create([
-            'name' => 'Admin User',
+            'name' => 'Superadmin',
             'email' => 'admin@genaf.com',
-            'username' => 'admin',
-            'password' => bcrypt('password'),
+            'username' => 'superadmin',
+            'password' => bcrypt('20132013'),
             'department_id' => 1, // General Department
             'phone' => '+62-123-456-7890',
             'is_active' => true,
@@ -36,7 +37,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Manager User',
             'email' => 'manager@genaf.com',
             'username' => 'manager',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('20132013'),
             'department_id' => 1, // General Department
             'phone' => '+62-123-456-7891',
             'is_active' => true,
@@ -47,7 +48,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Employee User',
             'email' => 'employee@genaf.com',
             'username' => 'employee',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('20132013'),
             'department_id' => 1, // General Department
             'phone' => '+62-123-456-7892',
             'is_active' => true,
@@ -59,7 +60,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'GA Admin User',
             'email' => 'gaadmin@genaf.com',
             'username' => 'gaadmin',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('20132013'),
             'department_id' => 1, // General Department
             'phone' => '+62-123-456-7893',
             'is_active' => true,
@@ -71,7 +72,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Finance Dept Head',
             'email' => 'finance.depthead@genaf.com',
             'username' => 'finance_depthead',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('20132013'),
             'department_id' => 8, // Finance
             'phone' => '+62-123-456-7894',
             'is_active' => true,
@@ -83,7 +84,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'IT Dept Head',
             'email' => 'it.depthead@genaf.com',
             'username' => 'it_depthead',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('20132013'),
             'department_id' => 17, // Information Technology
             'phone' => '+62-123-456-7895',
             'is_active' => true,
@@ -95,7 +96,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Finance Employee',
             'email' => 'finance.employee@genaf.com',
             'username' => 'finance_employee',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('20132013'),
             'department_id' => 8, // Finance
             'phone' => '+62-123-456-7896',
             'is_active' => true,

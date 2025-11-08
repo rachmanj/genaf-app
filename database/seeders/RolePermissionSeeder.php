@@ -144,8 +144,11 @@ class RolePermissionSeeder extends Seeder
             'delete vehicle maintenance',
             'view vehicle documents',
             'create vehicle documents',
+            'edit vehicle documents',
             'delete vehicle documents',
             'download vehicle documents',
+            'import vehicles',
+            'sync vehicles',
 
             // Asset Inventory
             'view assets',
@@ -246,12 +249,19 @@ class RolePermissionSeeder extends Seeder
             'edit room maintenances',
             'complete room maintenances',
             'view vehicles',
+            'view vehicle documents',
+            'create vehicle documents',
+            'edit vehicle documents',
+            'delete vehicle documents',
+            'download vehicle documents',
             'view fuel records',
             'view vehicle maintenance',
             'view assets',
             'view asset maintenance',
             'view asset transfers',
             'view reports',
+            'import vehicles',
+            'sync vehicles',
         ];
         $gaAdminRole->syncPermissions($gaAdminPermissions);
 

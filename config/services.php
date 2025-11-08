@@ -31,4 +31,9 @@ return [
         ],
     ],
 
+    'arkfleet' => [
+        'base_url' => env('ARKFLEET_API_URL'),
+        'timeout' => env('ARKFLEET_API_TIMEOUT', 15),
+    ],
+
 ];

@@ -731,3 +731,95 @@ All decisions are scheduled for review in March 2025 to ensure they continue to 
 - Total of 59+ view files reorganized into module directories
 
 **Review Date**: May 2026
+
+---
+
+## ADR-021: Meeting Room Reservation Approval & Allocation Workflow
+
+**Date**: 2025-11-06  
+**Status**: Accepted  
+**Context**: GENAF teams requested a booking system for internal meeting rooms with catering needs and clear audit trail. We needed to balance department ownership with GA Administration oversight, handle multi-day meetings, and track optional consumption services.
+
+**Decision**: Build a two-level approval workflow (Department Head → GA Admin) with server-side DataTables, AJAX endpoints, and modals for approvals/rejections. GA Admin allocates rooms after approval with overlap/capacity checks. Consumption requests are stored per day/type in `meeting_consumption_requests` to support catering fulfilment.
+
+**Alternatives Considered**:
+
+1. Single-step GA Admin approval without department review
+2. Automatic room allocation on submission (no manual intervention)
+3. Two-level approval with manual allocation and catering tracking (chosen)
+
+**Consequences**:
+
+- ✅ Department heads retain visibility of their teams' bookings
+- ✅ GA Admin can enforce availability and capacity constraints during allocation
+- ✅ Detailed consumption breakdown enables future fulfilment workflows
+- ✅ Server-side DataTables keep lists performant with department scoping
+- ⚠️ Requires follow-up work for notifications and consumption fulfilment UI
+- ⚠️ Additional endpoints create more surface area for permission management
+
+**Review Date**: 2026-02-01
+
+---
+
+## ADR-023: ArkFleet Sync via Queued Jobs
+
+- **Date**: 2025-11-08  
+- **Status**: Accepted  
+- **Context**: Manual ArkFleet sync actions could take several seconds and previously ran inside HTTP requests, risking timeouts and poor UX when importing or refreshing vehicles.  
+- **Decision**: Dispatch sync work to a queued job (`ArkFleetSyncJob`) invoked from controller actions (`VehicleImportController@syncSelected` / `@syncAll`). Controllers now respond immediately with a flash message while the job executes `ArkFleetSyncService` in the background. Sync controls on the vehicles index queue jobs via buttons/modal, guarded by new `sync vehicles` permission.  
+- **Consequences**:  
+  - ✅ Prevents long-running requests and supports future scheduling/retries  
+  - ✅ Centralises logging of sync results for diagnostics  
+  - ✅ Enables background processing for bulk "sync all" actions from the index page  
+  - ⚠️ Requires queue worker to be running in production
+
+**Review Date**: 2026-01-15
+
+---
+
+## ADR-024: Vehicle Document Data Model & Revision History
+
+**Date**: 2025-11-08  
+**Status**: Accepted  
+**Context**: Vehicle documents were stored in a single table with an enum `document_type`, basic issue/expiry dates, and no historical tracking. GA Admin requires structured metadata (document number, supplier, amounts), reminders, and an audit trail for renewals/extensions.  
+**Decision**: Introduce `vehicle_document_types` master data, remodel `vehicle_documents` with typed foreign key and richer metadata, and add `vehicle_document_revisions` for immutable snapshots on create/update. Model events now capture revisions automatically, and seeders register STNK/KIR defaults with reminder windows.  
+**Alternatives Considered**:  
+1. Extend existing table with new columns but keep enum + overwrite history  
+2. Create separate tables per document type managed independently  
+3. Centralise document metadata with type master and revision snapshots (chosen)  
+**Consequences**:  
+- ✅ Supports reminders/monitoring with clear `due_date` and supplier/amount fields  
+- ✅ Revision history preserves every extension, including uploaded files and notes  
+- ✅ Master data lets us configure lead times per document type (STNK, KIR, etc.)  
+- ⚠️ Migration requires backfilling legacy rows and updating validation/UI  
+- ⚠️ Future UI/notification layers must respect the new relationships  
+**Review Date**: 2026-03-01
+
+---
+
+## ADR-022: ArkFleet Integration Service Layer & Sync Strategy
+
+**Date**: 2025-11-08  
+**Status**: Accepted  
+**Context**: GA Admin team needs ARKFleet vehicle data inside GENAF with traceability, manual control, and the ability to reconcile differences when ARKFleet removes units.  
+
+**Decision**: Introduce a dedicated ArkFleet integration layer composed of:
+- Schema changes on `vehicles` (`unit_no`, `nomor_polisi`, `plant_group`, sync metadata, payload JSON store)
+- Service classes `ArkFleetApiService`, `ArkFleetImportService`, and `ArkFleetSyncService`
+- Status mapping/normalisation trait shared across services  
+Manual syncs pull data via services, persist the raw payload for diagnostics, update local attributes, and mark units missing from the latest sync as inactive with `arkfleet_sync_status = 'missing'`.
+
+**Alternatives Considered**:
+1. Controller-level HTTP calls with direct array manipulation
+2. Scheduled full refresh that truncated and re-seeded the vehicles table
+3. Dedicated service layer with transactional updates and payload storage (chosen)
+
+**Consequences**:
+- ✅ Encapsulated integration logic reusable by import UI, background jobs, and controllers
+- ✅ Stored payload history enables troubleshooting and audit trails
+- ✅ Sync metadata provides visibility in the UI (last sync, status, message)
+- ✅ Missing units automatically deactivated, preventing stale vehicles in the catalogue
+- ⚠️ Requires Doctrine DBAL for column alterations and JSON storage management
+- ⚠️ Sync jobs must guard against concurrent execution (future queue integration)
+
+**Review Date**: 2026-01-15

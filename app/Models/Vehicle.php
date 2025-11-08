@@ -11,14 +11,20 @@ class Vehicle extends Model
     use HasFactory;
 
     protected $fillable = [
-        'plate_number',
+        'unit_no',
+        'nomor_polisi',
         'brand',
         'model',
         'year',
-        'type',
+        'plant_group',
         'current_odometer',
         'status',
-        'notes',
+        'current_project_code',
+        'remarks',
+        'arkfleet_synced_at',
+        'arkfleet_sync_status',
+        'arkfleet_sync_message',
+        'arkfleet_last_payload',
         'is_active',
     ];
 
@@ -28,6 +34,8 @@ class Vehicle extends Model
             'year' => 'integer',
             'current_odometer' => 'integer',
             'is_active' => 'boolean',
+            'arkfleet_synced_at' => 'datetime',
+            'arkfleet_last_payload' => 'array',
         ];
     }
 
@@ -60,7 +68,7 @@ class Vehicle extends Model
      */
     public function isActive(): bool
     {
-        return $this->status === 'active' && $this->is_active;
+        return in_array($this->status, ['active'], true) && $this->is_active;
     }
 
     /**
@@ -69,8 +77,8 @@ class Vehicle extends Model
     public function getExpiringDocumentsAttribute()
     {
         return $this->documents()
-            ->where('expiry_date', '<=', now()->addMonths(3))
-            ->where('expiry_date', '>', now())
+            ->whereDate('due_date', '<=', now()->addMonths(3))
+            ->whereDate('due_date', '>', now())
             ->get();
     }
 
