@@ -271,6 +271,9 @@ Route::prefix('meeting-rooms')->middleware('auth')->name('meeting-rooms.')->grou
 });
 
 Route::get('/dashboard', function () {
+    if (!auth()->check()) {
+        return redirect()->route('login');
+    }
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
