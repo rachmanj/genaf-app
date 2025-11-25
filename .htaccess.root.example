@@ -1,4 +1,4 @@
-# Root .htaccess for /gamma subdirectory deployment
+# Root .htaccess for /gamma subdirectory deployment with server.php
 # Place this file in the root of /gamma folder on production server
 # Rename it to .htaccess
 
@@ -9,18 +9,18 @@
 
     RewriteEngine On
 
-    # Redirect all requests to public folder
+    # Handle existing files and directories
     RewriteCond %{REQUEST_FILENAME} -d [OR]
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ ^$1 [N]
 
-    # Redirect files with extensions to public folder
+    # Handle files with extensions - redirect to public folder
     RewriteCond %{REQUEST_URI} (\.\w+$) [NC]
     RewriteRule ^(.*)$ public/$1 [L]
 
-    # Redirect all other requests to public/index.php
+    # All other requests go to server.php
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^ public/index.php [L]
+    RewriteRule ^ server.php [L]
 </IfModule>
 
