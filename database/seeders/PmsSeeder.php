@@ -15,17 +15,17 @@ class PmsSeeder extends Seeder
     {
         // Buildings
         $hq = Building::firstOrCreate(
-            ['code' => 'HQ-JKT'],
+            ['code' => 'HO-REG'],
             [
-                'name' => 'Headquarters Jakarta',
-                'city' => 'Jakarta',
+                'name' => 'Mess Regency',
+                'city' => 'Balikpapan',
                 'country' => 'Indonesia',
                 'status' => 'active',
             ]
         );
 
         $bdg = Building::firstOrCreate(
-            ['code' => 'OPS-BDG'],
+            ['code' => 'HO-'],
             [
                 'name' => 'Operations Bandung',
                 'city' => 'Bandung',
@@ -111,5 +111,3 @@ class PmsSeeder extends Seeder
         ]);
     }
 }
-
-

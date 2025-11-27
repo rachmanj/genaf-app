@@ -74,9 +74,9 @@ class DatabaseSeeder extends Seeder
         // Now create other master data that may reference users
         $this->call([
             SupplySeeder::class,
-            VehicleSeeder::class,
-            TicketReservationSeeder::class,
-            PmsSeeder::class,
+            // VehicleSeeder::class,
+            // TicketReservationSeeder::class,
+            // PmsSeeder::class,
         ]);
     }
 }

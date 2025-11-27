@@ -14,9 +14,9 @@ $uri = urldecode(
 // Handle subdirectory deployment (e.g., /gamma)
 // Remove the subdirectory prefix from URI if present
 // This allows the app to work when deployed at http://domain/gamma
-$scriptName = dirname($_SERVER['SCRIPT_NAME']);
-if ($scriptName !== '/' && strpos($uri, $scriptName) === 0) {
-    $uri = substr($uri, strlen($scriptName));
+$scriptDir = dirname($_SERVER['SCRIPT_NAME']);
+if ($scriptDir !== '/' && $scriptDir !== '\\' && strpos($uri, $scriptDir) === 0) {
+    $uri = substr($uri, strlen($scriptDir));
 }
 if ($uri === '') {
     $uri = '/';
@@ -30,4 +30,3 @@ if ($uri !== '/' && file_exists(__DIR__ . '/public' . $uri)) {
 }
 
 require_once __DIR__ . '/public/index.php';
-
